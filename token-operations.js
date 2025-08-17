@@ -551,7 +551,7 @@ class TokenOperations {
    * @param {number} depositAmount - HBAR deposit in tinybars
    * @returns {Object} Complete transaction details
    */
-  async processMemershipDeposit(memberAccountId, depositAmount) {
+  async processMembershipDeposit(memberAccountId, depositAmount) {
     console.log(`🎫 Processing membership deposit for ${memberAccountId}`);
     
     // Validate deposit amount (exactly 1 HBAR)

@@ -7,7 +7,8 @@ const {
   Client, 
   PrivateKey, 
   AccountId,
-  Status
+  Status,
+  Hbar
 } = require('@hashgraph/sdk');
 
 const { CONFIG, getNetworkConfig, isTestnet } = require('./config');
@@ -42,8 +43,8 @@ class HederaClient {
       
       // Configure client timeouts and settings
       this.client.setRequestTimeout(30000); // 30 seconds
-      this.client.setMaxTransactionFee(100_000_000); // 1 HBAR max fee
-      this.client.setMaxQueryPayment(50_000_000); // 0.5 HBAR max query payment
+      this.client.setDefaultMaxTransactionFee(new Hbar(1)); // 1 HBAR max fee
+      this.client.setDefaultMaxQueryPayment(new Hbar(0.5)); // 0.5 HBAR max query payment
       
       // Test connection
       await this.testConnection();

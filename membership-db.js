@@ -42,114 +42,404 @@ class MembershipDatabase {
    * Create necessary database tables
    */
   async createTables() {
-  return new Promise((resolve, reject) => {
-    const createMembersTable = `
-      CREATE TABLE IF NOT EXISTS members (
-        account_id TEXT PRIMARY KEY,
-        drip_tokens INTEGER NOT NULL DEFAULT 1,
-        deposited_hbar INTEGER NOT NULL,
-        total_wish_claimed INTEGER NOT NULL DEFAULT 0,
-        max_wish_allowed INTEGER NOT NULL DEFAULT ${CONFIG.parameters.maxWishPerDrip},
-        remaining_wish INTEGER NOT NULL DEFAULT ${CONFIG.parameters.maxWishPerDrip},
-        deposit_date TEXT NOT NULL,
-        last_claim_date TEXT,
-        is_active BOOLEAN NOT NULL DEFAULT 1,
-        lifecycle_count INTEGER NOT NULL DEFAULT 1,
-        lifetime_cap_reached BOOLEAN NOT NULL DEFAULT 0,
-        auto_release_date TEXT,
-        created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
-        updated_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
-      )
-    `;
+    return new Promise((resolve, reject) => {
+      const createMembersTable = `
+        CREATE TABLE IF NOT EXISTS members (
+          account_id TEXT PRIMARY KEY,
+          drip_tokens INTEGER NOT NULL DEFAULT 1,
+          deposited_hbar INTEGER NOT NULL,
+          total_wish_claimed INTEGER NOT NULL DEFAULT 0,
+          max_wish_allowed INTEGER NOT NULL DEFAULT ${CONFIG.parameters.maxWishPerDrip},
+          remaining_wish INTEGER NOT NULL DEFAULT ${CONFIG.parameters.maxWishPerDrip},
+          deposit_date TEXT NOT NULL,
+          last_claim_date TEXT,
+          is_active BOOLEAN NOT NULL DEFAULT 1,
+          lifecycle_count INTEGER NOT NULL DEFAULT 1,
+          lifetime_cap_reached BOOLEAN NOT NULL DEFAULT 0,
+          auto_release_date TEXT,
+          created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+          updated_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
+        )
+      `;
 
-    const createClaimsTable = `
-      CREATE TABLE IF NOT EXISTS claims (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        account_id TEXT NOT NULL,
-        claim_amount INTEGER NOT NULL,
-        claim_date TEXT NOT NULL,
-        daily_entitlement INTEGER NOT NULL,
-        cumulative_claimed INTEGER NOT NULL,
-        remaining_quota INTEGER NOT NULL,
-        transaction_id TEXT NOT NULL,
-        block_timestamp TEXT,
-        created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
-        FOREIGN KEY (account_id) REFERENCES members (account_id)
-      )
-    `;
+      const createClaimsTable = `
+        CREATE TABLE IF NOT EXISTS claims (
+          id INTEGER PRIMARY KEY AUTOINCREMENT,
+          account_id TEXT NOT NULL,
+          claim_amount INTEGER NOT NULL,
+          claim_date TEXT NOT NULL,
+          daily_entitlement INTEGER NOT NULL,
+          cumulative_claimed INTEGER NOT NULL,
+          remaining_quota INTEGER NOT NULL,
+          transaction_id TEXT NOT NULL,
+          block_timestamp TEXT,
+          created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+          FOREIGN KEY (account_id) REFERENCES members (account_id)
+        )
+      `;
 
-    const createRedemptionsTable = `
-      CREATE TABLE IF NOT EXISTS redemptions (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        account_id TEXT NOT NULL,
-        wish_amount INTEGER NOT NULL,
-        hbar_amount INTEGER NOT NULL,
-        exchange_rate REAL NOT NULL,
-        burn_transaction_id TEXT NOT NULL,
-        payment_transaction_id TEXT NOT NULL,
-        redemption_date TEXT NOT NULL,
-        created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
-        FOREIGN KEY (account_id) REFERENCES members (account_id)
-      )
-    `;
+      const createRedemptionsTable = `
+        CREATE TABLE IF NOT EXISTS redemptions (
+          id INTEGER PRIMARY KEY AUTOINCREMENT,
+          account_id TEXT NOT NULL,
+          wish_amount INTEGER NOT NULL,
+          hbar_amount INTEGER NOT NULL,
+          exchange_rate REAL NOT NULL,
+          burn_transaction_id TEXT NOT NULL,
+          payment_transaction_id TEXT NOT NULL,
+          redemption_date TEXT NOT NULL,
+          created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+          FOREIGN KEY (account_id) REFERENCES members (account_id)
+        )
+      `;
 
-    const createDailyStatesTable = `
-      CREATE TABLE IF NOT EXISTS daily_states (
-        date TEXT PRIMARY KEY,
-        active_holders INTEGER NOT NULL,
-        new_donors INTEGER NOT NULL,
-        growth_rate REAL NOT NULL DEFAULT 0.0,
-        cumulative_score REAL NOT NULL DEFAULT 0.0,
-        growth_multiplier REAL NOT NULL DEFAULT 1.0,
-        donor_booster INTEGER NOT NULL DEFAULT 0,
-        final_entitlement INTEGER NOT NULL,
-        total_wish_allocated INTEGER NOT NULL,
-        hcs_transaction_id TEXT,
-        snapshot_timestamp TEXT NOT NULL,
-        created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
-      )
-    `;
+      const createDailyStatesTable = `
+        CREATE TABLE IF NOT EXISTS daily_states (
+          date TEXT PRIMARY KEY,
+          active_holders INTEGER NOT NULL,
+          new_donors INTEGER NOT NULL,
+          growth_rate REAL NOT NULL DEFAULT 0.0,
+          cumulative_score REAL NOT NULL DEFAULT 0.0,
+          growth_multiplier REAL NOT NULL DEFAULT 1.0,
+          donor_booster INTEGER NOT NULL DEFAULT 0,
+          final_entitlement INTEGER NOT NULL,
+          total_wish_allocated INTEGER NOT NULL,
+          hcs_transaction_id TEXT,
+          snapshot_timestamp TEXT NOT NULL,
+          created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
+        )
+      `;
 
-    const createDonationsTable = `
-      CREATE TABLE IF NOT EXISTS donations (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        donor_account_id TEXT NOT NULL,
-        amount_hbar INTEGER NOT NULL,
-        drop_minted BOOLEAN NOT NULL DEFAULT 0,
-        rebate_wish INTEGER NOT NULL DEFAULT 0,
-        donation_date TEXT NOT NULL,
-        transaction_id TEXT NOT NULL,
-        drop_transaction_id TEXT,
-        rebate_transaction_id TEXT,
-        created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
-      )
-    `;
+      const createDonationsTable = `
+        CREATE TABLE IF NOT EXISTS donations (
+          id INTEGER PRIMARY KEY AUTOINCREMENT,
+          donor_account_id TEXT NOT NULL,
+          amount_hbar INTEGER NOT NULL,
+          drop_minted BOOLEAN NOT NULL DEFAULT 0,
+          rebate_wish INTEGER NOT NULL DEFAULT 0,
+          donation_date TEXT NOT NULL,
+          transaction_id TEXT NOT NULL,
+          drop_transaction_id TEXT,
+          rebate_transaction_id TEXT,
+          created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
+        )
+      `;
 
-    // Execute table creation
-    this.db.serialize(() => {
-      this.db.run(createMembersTable, (err) => {
-        if (err) reject(err);
-      });
-      
-      this.db.run(createClaimsTable, (err) => {
-        if (err) reject(err);
-      });
-      
-      this.db.run(createRedemptionsTable, (err) => {
-        if (err) reject(err);
-      });
-      
-      this.db.run(createDailyStatesTable, (err) => {
-        if (err) reject(err);
-      });
-      
-      this.db.run(createDonationsTable, (err) => {
-        if (err) reject(err);
-        else resolve();
+      // Execute table creation
+      this.db.serialize(() => {
+        this.db.run(createMembersTable, (err) => {
+          if (err) reject(err);
+        });
+        
+        this.db.run(createClaimsTable, (err) => {
+          if (err) reject(err);
+        });
+        
+        this.db.run(createRedemptionsTable, (err) => {
+          if (err) reject(err);
+        });
+        
+        this.db.run(createDailyStatesTable, (err) => {
+          if (err) reject(err);
+        });
+        
+        this.db.run(createDonationsTable, (err) => {
+          if (err) reject(err);
+          else resolve();
+        });
       });
     });
-  });
-}
+  }
+
+  // ═══════════ MEMBER MANAGEMENT ═══════════
+
+  /**
+   * Create new member record
+   * @param {string} accountId - Member account ID
+   * @param {number} depositAmount - HBAR deposit in tinybars
+   * @returns {Object} Created member record
+   */
+  async createMember(accountId, depositAmount) {
+    return new Promise((resolve, reject) => {
+      const memberData = {
+        account_id: accountId,
+        deposited_hbar: depositAmount,
+        deposit_date: new Date().toISOString(),
+        max_wish_allowed: CONFIG.parameters.maxWishPerDrip,
+        remaining_wish: CONFIG.parameters.maxWishPerDrip
+      };
+
+      const sql = `
+        INSERT INTO members (
+          account_id, deposited_hbar, deposit_date, 
+          max_wish_allowed, remaining_wish
+        ) VALUES (?, ?, ?, ?, ?)
+      `;
+
+      this.db.run(sql, [
+        memberData.account_id,
+        memberData.deposited_hbar,
+        memberData.deposit_date,
+        memberData.max_wish_allowed,
+        memberData.remaining_wish
+      ], function(err) {
+        if (err) {
+          console.error('❌ Failed to create member:', err.message);
+          reject(err);
+          return;
+        }
+
+        console.log(`✅ Member created: ${accountId}`);
+        resolve({ ...memberData, id: this.lastID });
+      });
+    });
+  }
+
+  /**
+   * Get member by account ID
+   * @param {string} accountId - Member account ID
+   * @returns {Object|null} Member record or null if not found
+   */
+  async getMember(accountId) {
+    return new Promise((resolve, reject) => {
+      const sql = `SELECT * FROM members WHERE account_id = ?`;
+      
+      this.db.get(sql, [accountId], (err, row) => {
+        if (err) {
+          console.error('❌ Failed to get member:', err.message);
+          reject(err);
+          return;
+        }
+        
+        resolve(row || null);
+      });
+    });
+  }
+
+  /**
+   * Check if account is already a member
+   * @param {string} accountId - Account to check
+   * @returns {boolean} True if member exists
+   */
+  async memberExists(accountId) {
+    const member = await this.getMember(accountId);
+    return member !== null;
+  }
+
+  /**
+   * Update member's claimed WISH amount
+   * @param {string} accountId - Member account ID
+   * @param {number} claimAmount - Amount of WISH claimed
+   * @returns {Object} Updated member record
+   */
+  async updateMemberClaim(accountId, claimAmount) {
+    return new Promise((resolve, reject) => {
+      const sql = `
+        UPDATE members 
+        SET 
+          total_wish_claimed = total_wish_claimed + ?,
+          remaining_wish = remaining_wish - ?,
+          last_claim_date = ?,
+          lifetime_cap_reached = CASE 
+            WHEN (remaining_wish - ?) <= 0 THEN 1 
+            ELSE lifetime_cap_reached 
+          END,
+          updated_at = CURRENT_TIMESTAMP
+        WHERE account_id = ?
+      `;
+      
+      const claimDate = new Date().toISOString();
+      
+      this.db.run(sql, [claimAmount, claimAmount, claimDate, claimAmount, accountId], function(err) {
+        if (err) {
+          console.error('❌ Failed to update member claim:', err.message);
+          reject(err);
+          return;
+        }
+        
+        if (this.changes === 0) {
+          reject(new Error(`Member not found: ${accountId}`));
+          return;
+        }
+        
+        console.log(`✅ Updated member claim: ${accountId} (+${claimAmount} WISH)`);
+        resolve({ accountId, claimAmount, claimDate });
+      });
+    });
+  }
+
+  /**
+   * Get all active members
+   * @returns {Array} List of active member records
+   */
+  async getActiveMembers() {
+    return new Promise((resolve, reject) => {
+      const sql = `SELECT * FROM members WHERE is_active = 1 ORDER BY deposit_date`;
+      
+      this.db.all(sql, [], (err, rows) => {
+        if (err) {
+          console.error('❌ Failed to get active members:', err.message);
+          reject(err);
+          return;
+        }
+        
+        resolve(rows || []);
+      });
+    });
+  }
+
+  /**
+   * Process AutoRelease for member who reached lifetime cap
+   * @param {string} accountId - Member account ID
+   * @returns {Object} AutoRelease details
+   */
+  async processAutoRelease(accountId) {
+    return new Promise((resolve, reject) => {
+      const releaseDate = new Date().toISOString();
+      
+      const sql = `
+        UPDATE members 
+        SET 
+          is_active = 0,
+          auto_release_date = ?,
+          lifecycle_count = lifecycle_count + 1,
+          total_wish_claimed = 0,
+          remaining_wish = ?,
+          lifetime_cap_reached = 0,
+          updated_at = CURRENT_TIMESTAMP
+        WHERE account_id = ? AND lifetime_cap_reached = 1
+      `;
+      
+      this.db.run(sql, [releaseDate, CONFIG.parameters.maxWishPerDrip, accountId], function(err) {
+        if (err) {
+          console.error('❌ Failed to process AutoRelease:', err.message);
+          reject(err);
+          return;
+        }
+        
+        if (this.changes === 0) {
+          reject(new Error(`No eligible member for AutoRelease: ${accountId}`));
+          return;
+        }
+        
+        console.log(`✅ AutoRelease processed: ${accountId}`);
+        resolve({
+          accountId,
+          releaseDate,
+          refundAmount: CONFIG.parameters.memberRefund * CONFIG.constants.HBAR_TO_TINYBAR,
+          treasuryFee: CONFIG.parameters.treasuryFee * CONFIG.constants.HBAR_TO_TINYBAR
+        });
+      });
+    });
+  }
+
+  // ═══════════ CLAIMS TRACKING ═══════════
+
+  /**
+   * Record a new claim
+   * @param {Object} claimData - Claim details
+   * @returns {Object} Recorded claim
+   */
+  async recordClaim(claimData) {
+    return new Promise((resolve, reject) => {
+      const sql = `
+        INSERT INTO claims (
+          account_id, claim_amount, claim_date, daily_entitlement,
+          cumulative_claimed, remaining_quota, transaction_id, block_timestamp
+        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+      `;
+      
+      this.db.run(sql, [
+        claimData.accountId,
+        claimData.claimAmount,
+        claimData.claimDate,
+        claimData.dailyEntitlement,
+        claimData.cumulativeClaimed,
+        claimData.remainingQuota,
+        claimData.transactionId,
+        claimData.blockTimestamp
+      ], function(err) {
+        if (err) {
+          console.error('❌ Failed to record claim:', err.message);
+          reject(err);
+          return;
+        }
+        
+        console.log(`✅ Claim recorded: ${claimData.accountId} -> ${claimData.claimAmount} WISH`);
+        resolve({ ...claimData, id: this.lastID });
+      });
+    });
+  }
+
+  /**
+   * Get claim history for member
+   * @param {string} accountId - Member account ID
+   * @param {number} limit - Maximum number of claims to return
+   * @returns {Array} Claim history
+   */
+  async getClaimHistory(accountId, limit = 100) {
+    return new Promise((resolve, reject) => {
+      const sql = `
+        SELECT * FROM claims 
+        WHERE account_id = ? 
+        ORDER BY claim_date DESC 
+        LIMIT ?
+      `;
+      
+      this.db.all(sql, [accountId, limit], (err, rows) => {
+        if (err) {
+          console.error('❌ Failed to get claim history:', err.message);
+          reject(err);
+          return;
+        }
+        
+        resolve(rows || []);
+      });
+    });
+  }
+
+  // ═══════════ DAILY STATE MANAGEMENT ═══════════
+
+  /**
+   * Record daily state snapshot
+   * @param {Object} stateData - Daily state data
+   * @returns {Object} Recorded state
+   */
+  async recordDailyState(stateData) {
+    return new Promise((resolve, reject) => {
+      const sql = `
+        INSERT OR REPLACE INTO daily_states (
+          date, active_holders, new_donors, growth_rate,
+          cumulative_score, growth_multiplier, donor_booster,
+          final_entitlement, total_wish_allocated, hcs_transaction_id,
+          snapshot_timestamp
+        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+      `;
+      
+      this.db.run(sql, [
+        stateData.date,
+        stateData.activeHolders,
+        stateData.newDonors,
+        stateData.growthRate,
+        stateData.cumulativeScore,
+        stateData.growthMultiplier,
+        stateData.donorBooster,
+        stateData.finalEntitlement,
+        stateData.totalWishAllocated,
+        stateData.hcsTransactionId,
+        stateData.snapshotTimestamp
+      ], function(err) {
+        if (err) {
+          console.error('❌ Failed to record daily state:', err.message);
+          reject(err);
+          return;
+        }
+        
+        console.log(`✅ Daily state recorded: ${stateData.date}`);
+        resolve({ ...stateData, id: this.lastID });
+      });
+    });
+  }
 
   /**
    * Get daily state by date
@@ -479,293 +769,4 @@ module.exports = {
   MembershipDatabase,
   getMembershipDatabase,
   closeMembershipDatabase
-};createMembersTable, (err) => {
-          if (err) reject(err);
-        });
-        
-        this.db.run(createClaimsTable, (err) => {
-          if (err) reject(err);
-        });
-        
-        this.db.run(createRedemptionsTable, (err) => {
-          if (err) reject(err);
-        });
-        
-        this.db.run(createDailyStatesTable, (err) => {
-          if (err) reject(err);
-        });
-        
-        this.db.run(createDonationsTable, (err) => {
-          if (err) reject(err);
-          else resolve();
-        });
-      });
-    });
-  }
-
-  // ═══════════ MEMBER MANAGEMENT ═══════════
-
-  /**
-   * Create new member record
-   * @param {string} accountId - Member account ID
-   * @param {number} depositAmount - HBAR deposit in tinybars
-   * @returns {Object} Created member record
-   */
-  async createMember(accountId, depositAmount) {
-    return new Promise((resolve, reject) => {
-      const memberData = {
-        account_id: accountId,
-        deposited_hbar: depositAmount,
-        deposit_date: new Date().toISOString(),
-        max_wish_allowed: CONFIG.parameters.maxWishPerDrip,
-        remaining_wish: CONFIG.parameters.maxWishPerDrip
-      };
-
-      const sql = `
-        INSERT INTO members (
-          account_id, deposited_hbar, deposit_date, 
-          max_wish_allowed, remaining_wish
-        ) VALUES (?, ?, ?, ?, ?)
-      `;
-
-      this.db.run(sql, [
-        memberData.account_id,
-        memberData.deposited_hbar,
-        memberData.deposit_date,
-        memberData.max_wish_allowed,
-        memberData.remaining_wish
-      ], function(err) {
-        if (err) {
-          console.error('❌ Failed to create member:', err.message);
-          reject(err);
-          return;
-        }
-
-        console.log(`✅ Member created: ${accountId}`);
-        resolve({ ...memberData, id: this.lastID });
-      });
-    });
-  }
-
-  /**
-   * Get member by account ID
-   * @param {string} accountId - Member account ID
-   * @returns {Object|null} Member record or null if not found
-   */
-  async getMember(accountId) {
-    return new Promise((resolve, reject) => {
-      const sql = `SELECT * FROM members WHERE account_id = ?`;
-      
-      this.db.get(sql, [accountId], (err, row) => {
-        if (err) {
-          console.error('❌ Failed to get member:', err.message);
-          reject(err);
-          return;
-        }
-        
-        resolve(row || null);
-      });
-    });
-  }
-
-  /**
-   * Check if account is already a member
-   * @param {string} accountId - Account to check
-   * @returns {boolean} True if member exists
-   */
-  async memberExists(accountId) {
-    const member = await this.getMember(accountId);
-    return member !== null;
-  }
-
-  /**
-   * Update member's claimed WISH amount
-   * @param {string} accountId - Member account ID
-   * @param {number} claimAmount - Amount of WISH claimed
-   * @returns {Object} Updated member record
-   */
-  async updateMemberClaim(accountId, claimAmount) {
-    return new Promise((resolve, reject) => {
-      const sql = `
-        UPDATE members 
-        SET 
-          total_wish_claimed = total_wish_claimed + ?,
-          remaining_wish = remaining_wish - ?,
-          last_claim_date = ?,
-          lifetime_cap_reached = CASE 
-            WHEN (remaining_wish - ?) <= 0 THEN 1 
-            ELSE lifetime_cap_reached 
-          END,
-          updated_at = CURRENT_TIMESTAMP
-        WHERE account_id = ?
-      `;
-      
-      const claimDate = new Date().toISOString();
-      
-      this.db.run(sql, [claimAmount, claimAmount, claimDate, claimAmount, accountId], function(err) {
-        if (err) {
-          console.error('❌ Failed to update member claim:', err.message);
-          reject(err);
-          return;
-        }
-        
-        if (this.changes === 0) {
-          reject(new Error(`Member not found: ${accountId}`));
-          return;
-        }
-        
-        console.log(`✅ Updated member claim: ${accountId} (+${claimAmount} WISH)`);
-        resolve({ accountId, claimAmount, claimDate });
-      });
-    });
-  }
-
-  /**
-   * Get all active members
-   * @returns {Array} List of active member records
-   */
-  async getActiveMembers() {
-    return new Promise((resolve, reject) => {
-      const sql = `SELECT * FROM members WHERE is_active = 1 ORDER BY deposit_date`;
-      
-      this.db.all(sql, [], (err, rows) => {
-        if (err) {
-          console.error('❌ Failed to get active members:', err.message);
-          reject(err);
-          return;
-        }
-        
-        resolve(rows || []);
-      });
-    });
-  }
-
-  /**
-   * Process AutoRelease for member who reached lifetime cap
-   * @param {string} accountId - Member account ID
-   * @returns {Object} AutoRelease details
-   */
-  async processAutoRelease(accountId) {
-    return new Promise((resolve, reject) => {
-      const releaseDate = new Date().toISOString();
-      
-      const sql = `
-        UPDATE members 
-        SET 
-          is_active = 0,
-          auto_release_date = ?,
-          lifecycle_count = lifecycle_count + 1,
-          total_wish_claimed = 0,
-          remaining_wish = ?,
-          lifetime_cap_reached = 0,
-          updated_at = CURRENT_TIMESTAMP
-        WHERE account_id = ? AND lifetime_cap_reached = 1
-      `;
-      
-      this.db.run(sql, [releaseDate, CONFIG.parameters.maxWishPerDrip, accountId], function(err) {
-        if (err) {
-          console.error('❌ Failed to process AutoRelease:', err.message);
-          reject(err);
-          return;
-        }
-        
-        if (this.changes === 0) {
-          reject(new Error(`No eligible member for AutoRelease: ${accountId}`));
-          return;
-        }
-        
-        console.log(`✅ AutoRelease processed: ${accountId}`);
-        resolve({
-          accountId,
-          releaseDate,
-          refundAmount: CONFIG.parameters.memberRefund * CONFIG.constants.HBAR_TO_TINYBAR,
-          treasuryFee: CONFIG.parameters.treasuryFee * CONFIG.constants.HBAR_TO_TINYBAR
-        });
-      });
-    });
-  }
-
-  // ═══════════ CLAIMS TRACKING ═══════════
-
-  /**
-   * Record a new claim
-   * @param {Object} claimData - Claim details
-   * @returns {Object} Recorded claim
-   */
-  async recordClaim(claimData) {
-    return new Promise((resolve, reject) => {
-      const sql = `
-        INSERT INTO claims (
-          account_id, claim_amount, claim_date, daily_entitlement,
-          cumulative_claimed, remaining_quota, transaction_id, block_timestamp
-        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?)
-      `;
-      
-      this.db.run(sql, [
-        claimData.accountId,
-        claimData.claimAmount,
-        claimData.claimDate,
-        claimData.dailyEntitlement,
-        claimData.cumulativeClaimed,
-        claimData.remainingQuota,
-        claimData.transactionId,
-        claimData.blockTimestamp
-      ], function(err) {
-        if (err) {
-          console.error('❌ Failed to record claim:', err.message);
-          reject(err);
-          return;
-        }
-        
-        console.log(`✅ Claim recorded: ${claimData.accountId} -> ${claimData.claimAmount} WISH`);
-        resolve({ ...claimData, id: this.lastID });
-      });
-    });
-  }
-
-  /**
-   * Get claim history for member
-   * @param {string} accountId - Member account ID
-   * @param {number} limit - Maximum number of claims to return
-   * @returns {Array} Claim history
-   */
-  async getClaimHistory(accountId, limit = 100) {
-    return new Promise((resolve, reject) => {
-      const sql = `
-        SELECT * FROM claims 
-        WHERE account_id = ? 
-        ORDER BY claim_date DESC 
-        LIMIT ?
-      `;
-      
-      this.db.all(sql, [accountId, limit], (err, rows) => {
-        if (err) {
-          console.error('❌ Failed to get claim history:', err.message);
-          reject(err);
-          return;
-        }
-        
-        resolve(rows || []);
-      });
-    });
-  }
-
-  // ═══════════ DAILY STATE MANAGEMENT ═══════════
-
-  /**
-   * Record daily state snapshot
-   * @param {Object} stateData - Daily state data
-   * @returns {Object} Recorded state
-   */
-  async recordDailyState(stateData) {
-    return new Promise((resolve, reject) => {
-      const sql = `
-        INSERT OR REPLACE INTO daily_states (
-          date, active_holders, new_donors, growth_rate,
-          cumulative_score, growth_multiplier, donor_booster,
-          final_entitlement, total_wish_allocated, hcs_transaction_id,
-          snapshot_timestamp
-        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-      `;
-      
-      this.db.run(
+};

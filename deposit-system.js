@@ -45,7 +45,7 @@ class DepositSystem {
       await this.validateNewMember(accountId);
       
       // 3. Execute token operations
-      const tokenResult = await this.tokenOps.processMemershipDeposit(accountId, depositAmount);
+      const tokenResult = await this.tokenOps.processMembershipDeposit(accountId, depositAmount);
       
       // 4. Create member record in database
       const memberRecord = await this.database.createMember(accountId, depositAmount);
@@ -418,3 +418,63 @@ module.exports = {
   DepositSystem,
   getDepositSystem
 };
+
+// Quick Test
+async function quickTest() {
+  try {
+    console.log('🧪 Starting initialization test...');
+    const depositSystem = await getDepositSystem();
+    console.log('✅ Deposit system initialized successfully!');
+    
+    // Test basic info
+    const info = depositSystem.getDepositInfo();
+    console.log('📋 Deposit requirements:');
+    console.log(`   - Amount: ${info.requirements.depositAmountHbar} HBAR`);
+    console.log(`   - Min balance needed: ${info.requirements.minimumAccountBalance} HBAR`);
+    console.log(`   - Benefits: ${info.benefits.dripTokens} DRIP token, ${info.benefits.maxLifetimeWish} max WISH`);
+    
+    // Test system health
+    const health = await depositSystem.getSystemHealth();
+    console.log('🏥 System health:', health.status);
+    
+    // 🆕 TEST ELIGIBILITY CHECK
+    console.log('\n🔍 Testing eligibility check...');
+    
+    // Test with your operator account (should be eligible)
+    const testAccountId = '0.0.6552092'; // Your operator account
+    console.log(`📋 Checking eligibility for: ${testAccountId}`);
+    
+    const eligibility = await depositSystem.checkEligibility(testAccountId);
+    console.log('📊 Eligibility Results:');
+    console.log(`   ✅ Account ID: ${eligibility.accountId}`);
+    console.log(`   ${eligibility.eligible ? '✅' : '❌'} Overall Eligible: ${eligibility.eligible}`);
+    
+    if (eligibility.checks) {
+      console.log('   🔍 Individual Checks:');
+      console.log(`      💰 Account Balance: ${eligibility.checks.accountBalance ? '✅ PASS' : '❌ FAIL'}`);
+      console.log(`      👤 New Member: ${eligibility.checks.newMember ? '✅ PASS' : '❌ FAIL'}`);
+      
+      if (eligibility.checks.tokenAssociations) {
+        console.log(`      🔗 Token Associations:`);
+        console.log(`         DRIP: ${eligibility.checks.tokenAssociations.drip ? '✅ Associated' : '❌ Not Associated'}`);
+        console.log(`         WISH: ${eligibility.checks.tokenAssociations.wish ? '✅ Associated' : '❌ Not Associated'}`);
+      }
+    }
+    
+    if (eligibility.issues && eligibility.issues.length > 0) {
+      console.log('   ⚠️  Issues Found:');
+      eligibility.issues.forEach(issue => {
+        console.log(`      - ${issue}`);
+      });
+    }
+    
+    console.log('\n🎯 Eligibility test completed!');
+    
+  } catch (error) {
+    console.error('❌ Test failed:', error.message);
+    console.error('📍 Stack trace:', error.stack);
+  }
+  
+  // Exit cleanly
+  process.exit(0);
+}
