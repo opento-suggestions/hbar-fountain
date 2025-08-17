@@ -1,0 +1,12 @@
+{
+  "name": "my-hedera-project",
+  "version": "1.0.0",
+  "type": "module",
+  "scripts": {
+    "start": "node index.js"
+  },
+  "dependencies": {
+    "@hashgraph/sdk": "^2.70.0",
+    "dotenv": "^17.2.1"
+  }
+}
