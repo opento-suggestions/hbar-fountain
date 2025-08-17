@@ -6,6 +6,9 @@
 // Environment-specific configuration
 const ENVIRONMENT = process.env.NODE_ENV || 'testnet';
 
+// Load environment variables
+require('dotenv').config({ path: './.env' });
+
 const CONFIG = {
   // Network Configuration
   network: {
@@ -23,7 +26,7 @@ const CONFIG = {
     }
   },
 
-  // Protocol Accounts (from paste.txt working implementation)
+  // Protocol Accounts 
   accounts: {
     treasury: process.env.TREASURY_ACCOUNT_ID || '0.0.6552092',
     treasuryKey: process.env.TREASURY_PRIVATE_KEY,
@@ -31,7 +34,7 @@ const CONFIG = {
     operatorKey: process.env.OPERATOR_PRIVATE_KEY
   },
 
-  // HTS Token Configuration (from paste.txt)
+  // HTS Token Configuration 
   tokens: {
     DRIP: {
       id: process.env.DRIP_TOKEN_ID || '0.0.6591211',
@@ -62,7 +65,7 @@ const CONFIG = {
     }
   },
 
-  // Infrastructure (from paste.txt)
+  // Infrastructure 
   infrastructure: {
     hcsTopic: process.env.HCS_TOPIC_ID || '0.0.6591043',
     database: {
@@ -74,7 +77,7 @@ const CONFIG = {
     }
   },
 
-  // Protocol Parameters (exact from project_knowledge.json)
+  // Protocol Parameters 
   parameters: {
     // Core Economics
     membershipDeposit: 100000000,     // 1 HBAR in tinybars
@@ -82,7 +85,7 @@ const CONFIG = {
     maxWishPerDrip: 1000,             // Lifetime quota per DRIP
     wishToHbarRate: 0.001,            // 1 WISH = 0.001 HBAR
     
-    // AutoRelease Split (from project_knowledge.json)
+    // AutoRelease Split 
     treasuryFee: 0.2,                 // 0.2 HBAR fee on lifecycle end
     memberRefund: 0.8,                // 0.8 HBAR refund to member
     
@@ -91,7 +94,7 @@ const CONFIG = {
     donationRebateThreshold: 100000000, // 1 HBAR for rebate eligibility
     donationRebateRate: 10,           // ~1% rebate (10 WISH per HBAR)
     
-    // Daily Mechanics (from project_knowledge.json formulas)
+    // Daily Mechanics 
     booster: {
       formula: 'min(floor(50 * ((Dt/Nt) - 1)), 25)',
       maxBooster: 25,

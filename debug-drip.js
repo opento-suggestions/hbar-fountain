@@ -12,7 +12,7 @@ class DripDebugger {
     async debugDripToken() {
         console.log("🔍 DEBUGGING DRIP TOKEN HOLDINGS");
         console.log("=" * 50);
-        console.log(`DRIP Token ID: ${this.config.tokens.DRIP}`);
+        console.log(`DRIP Token ID: ${this.config.tokens.DRIP.id}`);
         console.log(`Treasury Account: ${this.config.accounts.treasury}`);
         console.log("");
         
@@ -20,7 +20,7 @@ class DripDebugger {
             // Check raw token balances
             console.log("📊 Fetching ALL DRIP balances (including treasury)...");
             const response = await fetch(
-                `${this.mirrorNodeUrl}/api/v1/tokens/${this.config.tokens.DRIP}/balances`
+                `${this.mirrorNodeUrl}/api/v1/tokens/${this.config.tokens.DRIP.id}/balances`
             );
             
             if (!response.ok) {

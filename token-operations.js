@@ -18,7 +18,7 @@ const {
   PrivateKey
 } = require('@hashgraph/sdk');
 
-const { CONFIG } = require('../config');
+const { CONFIG } = require('./config');
 const { getHederaClient } = require('./hedera-client');
 
 class TokenOperations {

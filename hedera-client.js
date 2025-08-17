@@ -10,7 +10,7 @@ const {
   Status
 } = require('@hashgraph/sdk');
 
-const { CONFIG, getNetworkConfig, isTestnet } = require('../config');
+const { CONFIG, getNetworkConfig, isTestnet } = require('./config');
 
 class HederaClient {
   constructor() {

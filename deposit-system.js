@@ -3,10 +3,10 @@
  * Handles 1 HBAR → 1 DRIP membership token flow
  */
 
-const { CONFIG } = require('../config');
-const { getTokenOperations } = require('../utils/token-operations');
-const { getMembershipDatabase } = require('../database/membership-db');
-const { getHederaClient } = require('../utils/hedera-client');
+const { CONFIG } = require('./config');
+const { getTokenOperations } = require('./token-operations');
+const { getMembershipDatabase } = require('./membership-db');
+const { getHederaClient } = require('./hedera-client');
 
 class DepositSystem {
   constructor() {

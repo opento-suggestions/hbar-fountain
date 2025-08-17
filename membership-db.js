@@ -4,7 +4,7 @@
  */
 
 const sqlite3 = require('sqlite3').verbose();
-const { CONFIG } = require('../config');
+const { CONFIG } = require('./config');
 
 class MembershipDatabase {
   constructor() {
@@ -42,115 +42,114 @@ class MembershipDatabase {
    * Create necessary database tables
    */
   async createTables() {
-    return new Promise((resolve, reject) => {
-      const createMembersTable = `
-        CREATE TABLE IF NOT EXISTS members (
-          account_id TEXT PRIMARY KEY,
-          drip_tokens INTEGER NOT NULL DEFAULT 1,
-          deposited_hbar INTEGER NOT NULL,
-          total_wish_claimed INTEGER NOT NULL DEFAULT 0,
-          max_wish_allowed INTEGER NOT NULL DEFAULT ${CONFIG.parameters.maxWishPerDrip},
-          remaining_wish INTEGER NOT NULL DEFAULT ${CONFIG.parameters.maxWishPerDrip},
-          deposit_date TEXT NOT NULL,
-          last_claim_date TEXT,
-          is_active BOOLEAN NOT NULL DEFAULT 1,
-          lifecycle_count INTEGER NOT NULL DEFAULT 1,
-          lifetime_cap_reached BOOLEAN NOT NULL DEFAULT 0,
-          auto_release_date TEXT,
-          created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
-          updated_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
-        )
-      `;
+  return new Promise((resolve, reject) => {
+    const createMembersTable = `
+      CREATE TABLE IF NOT EXISTS members (
+        account_id TEXT PRIMARY KEY,
+        drip_tokens INTEGER NOT NULL DEFAULT 1,
+        deposited_hbar INTEGER NOT NULL,
+        total_wish_claimed INTEGER NOT NULL DEFAULT 0,
+        max_wish_allowed INTEGER NOT NULL DEFAULT ${CONFIG.parameters.maxWishPerDrip},
+        remaining_wish INTEGER NOT NULL DEFAULT ${CONFIG.parameters.maxWishPerDrip},
+        deposit_date TEXT NOT NULL,
+        last_claim_date TEXT,
+        is_active BOOLEAN NOT NULL DEFAULT 1,
+        lifecycle_count INTEGER NOT NULL DEFAULT 1,
+        lifetime_cap_reached BOOLEAN NOT NULL DEFAULT 0,
+        auto_release_date TEXT,
+        created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+        updated_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
+      )
+    `;
 
-      const createClaimsTable = `
-        CREATE TABLE IF NOT EXISTS claims (
-          id INTEGER PRIMARY KEY AUTOINCREMENT,
-          account_id TEXT NOT NULL,
-          claim_amount INTEGER NOT NULL,
-          claim_date TEXT NOT NULL,
-          daily_entitlement INTEGER NOT NULL,
-          cumulative_claimed INTEGER NOT NULL,
-          remaining_quota INTEGER NOT NULL,
-          transaction_id TEXT NOT NULL,
-          block_timestamp TEXT,
-          created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
-          FOREIGN KEY (account_id) REFERENCES members (account_id)
-        )
-      `;
+    const createClaimsTable = `
+      CREATE TABLE IF NOT EXISTS claims (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        account_id TEXT NOT NULL,
+        claim_amount INTEGER NOT NULL,
+        claim_date TEXT NOT NULL,
+        daily_entitlement INTEGER NOT NULL,
+        cumulative_claimed INTEGER NOT NULL,
+        remaining_quota INTEGER NOT NULL,
+        transaction_id TEXT NOT NULL,
+        block_timestamp TEXT,
+        created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+        FOREIGN KEY (account_id) REFERENCES members (account_id)
+      )
+    `;
 
-      const createRedemptionsTable = `
-        CREATE TABLE IF NOT EXISTS redemptions (
-          id INTEGER PRIMARY KEY AUTOINCREMENT,
-          account_id TEXT NOT NULL,
-          wish_amount INTEGER NOT NULL,
-          hbar_amount INTEGER NOT NULL,
-          exchange_rate REAL NOT NULL,
-          burn_transaction_id TEXT NOT NULL,
-          payment_transaction_id TEXT NOT NULL,
-          redemption_date TEXT NOT NULL,
-          created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
-          FOREIGN KEY (account_id) REFERENCES members (account_id)
-        )
-      `;
+    const createRedemptionsTable = `
+      CREATE TABLE IF NOT EXISTS redemptions (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        account_id TEXT NOT NULL,
+        wish_amount INTEGER NOT NULL,
+        hbar_amount INTEGER NOT NULL,
+        exchange_rate REAL NOT NULL,
+        burn_transaction_id TEXT NOT NULL,
+        payment_transaction_id TEXT NOT NULL,
+        redemption_date TEXT NOT NULL,
+        created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+        FOREIGN KEY (account_id) REFERENCES members (account_id)
+      )
+    `;
 
-      const createDailyStatesTable = `
-        CREATE TABLE IF NOT EXISTS daily_states (
-          date TEXT PRIMARY KEY,
-          active_holders INTEGER NOT NULL,
-          new_donors INTEGER NOT NULL,
-          growth_rate REAL NOT NULL DEFAULT 0.0,
-          cumulative_score REAL NOT NULL DEFAULT 0.0,
-          growth_multiplier REAL NOT NULL DEFAULT 1.0,
-          donor_booster INTEGER NOT NULL DEFAULT 0,
-          final_entitlement INTEGER NOT NULL,
-          total_wish_allocated INTEGER NOT NULL,
-          hcs_transaction_id TEXT,
-          snapshot_timestamp TEXT NOT NULL,
-          created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
-        )
-      `;
+    const createDailyStatesTable = `
+      CREATE TABLE IF NOT EXISTS daily_states (
+        date TEXT PRIMARY KEY,
+        active_holders INTEGER NOT NULL,
+        new_donors INTEGER NOT NULL,
+        growth_rate REAL NOT NULL DEFAULT 0.0,
+        cumulative_score REAL NOT NULL DEFAULT 0.0,
+        growth_multiplier REAL NOT NULL DEFAULT 1.0,
+        donor_booster INTEGER NOT NULL DEFAULT 0,
+        final_entitlement INTEGER NOT NULL,
+        total_wish_allocated INTEGER NOT NULL,
+        hcs_transaction_id TEXT,
+        snapshot_timestamp TEXT NOT NULL,
+        created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
+      )
+    `;
 
-      const createDonationsTable = `
-        CREATE TABLE IF NOT EXISTS donations (
-          id INTEGER PRIMARY KEY AUTOINCREMENT,
-          donor_account_id TEXT NOT NULL,
-          amount_hbar INTEGER NOT NULL,
-          drop_minted BOOLEAN NOT NULL DEFAULT 0,
-          rebate_wish INTEGER NOT NULL DEFAULT 0,
-          donation_date TEXT NOT NULL,
-          transaction_id TEXT NOT NULL,
-          drop_transaction_id TEXT,
-          rebate_transaction_id TEXT,
-          created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
-        )
-      `;
+    const createDonationsTable = `
+      CREATE TABLE IF NOT EXISTS donations (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        donor_account_id TEXT NOT NULL,
+        amount_hbar INTEGER NOT NULL,
+        drop_minted BOOLEAN NOT NULL DEFAULT 0,
+        rebate_wish INTEGER NOT NULL DEFAULT 0,
+        donation_date TEXT NOT NULL,
+        transaction_id TEXT NOT NULL,
+        drop_transaction_id TEXT,
+        rebate_transaction_id TEXT,
+        created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
+      )
+    `;
 
-      // Execute table creation
-      this.db.serialize(() => {
-        this.db.run(sql, [
-        stateData.date,
-        stateData.activeHolders,
-        stateData.newDonors,
-        stateData.growthRate,
-        stateData.cumulativeScore,
-        stateData.growthMultiplier,
-        stateData.donorBooster,
-        stateData.finalEntitlement,
-        stateData.totalWishAllocated,
-        stateData.hcsTransactionId,
-        stateData.snapshotTimestamp
-      ], function(err) {
-        if (err) {
-          console.error('❌ Failed to record daily state:', err.message);
-          reject(err);
-          return;
-        }
-        
-        console.log(`✅ Daily state recorded: ${stateData.date}`);
-        resolve({ ...stateData, id: this.lastID });
+    // Execute table creation
+    this.db.serialize(() => {
+      this.db.run(createMembersTable, (err) => {
+        if (err) reject(err);
+      });
+      
+      this.db.run(createClaimsTable, (err) => {
+        if (err) reject(err);
+      });
+      
+      this.db.run(createRedemptionsTable, (err) => {
+        if (err) reject(err);
+      });
+      
+      this.db.run(createDailyStatesTable, (err) => {
+        if (err) reject(err);
+      });
+      
+      this.db.run(createDonationsTable, (err) => {
+        if (err) reject(err);
+        else resolve();
       });
     });
-  }
+  });
+}
 
   /**
    * Get daily state by date
