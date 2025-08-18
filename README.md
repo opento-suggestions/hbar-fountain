@@ -1,18 +1,18 @@
-# Fountain Protocol
+# ⛲ Fountain Protocol
 
-Sustainable DeFi protocol on Hedera Hashgraph with membership tokens (DRIP), utility tokens (WISH), and donation recognition (DROP).
+Sustainable DeFi protocol on Hedera Hashgraph with membership tokens (💦 DRIP), utility tokens (✨ WISH), and donation recognition (💧 DROP).
 
 **Live Protocol:** https://peaceful-profiterole-7d59be.netlify.app/fountain-ui.html
 
 ## Token Architecture (HTS)
-- **DRIP**: Non-transferable membership token (freeze mechanics)
-- **WISH**: ERC-20 compatible utility token (mint/burn/transfer)
-- **DROP**: NFT recognition token (unique per donor)
+- **💦 DRIP**: Non-transferable membership token (freeze mechanics)
+- **✨ WISH**: ERC-20 compatible utility token (mint/burn/transfer)
+- **💧 DROP**: NFT recognition token (unique per donor)
 
 ## Protocol Economics
-- Membership: 1 HBAR → 1 DRIP
-- Daily rewards: 50 WISH/day (75 with DROP bonus) 
-- AutoRedeem: 1000 WISH → 1.8 HBAR (0.8 HBAR profit)
+- Membership: 1 HBAR → 1 💦 DRIP
+- Daily rewards: 50 ✨ WISH/day (75 with 💧 DROP bonus) 
+- AutoRedeem: 1000 ✨ WISH → 1.8 HBAR (0.8 HBAR profit)
 
 ## Hedera Integration
 - **HCS Topic**: 0.0.6591043 (daily snapshots)
