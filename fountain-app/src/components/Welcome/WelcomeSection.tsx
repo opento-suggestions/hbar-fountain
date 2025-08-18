@@ -11,20 +11,20 @@ const WelcomeSection: React.FC<WelcomeSectionProps> = ({ onConnectWallet }) => {
   return (
     <div className="max-w-4xl mx-auto text-center space-y-12">
       {/* Hero Section */}
-      <div className="space-y-6">
-        <h2 className="text-4xl font-bold text-slate-900">
+      <div className="space-y-8">
+        <h2 className="text-5xl font-bold fountain-text-primary leading-tight">
           Welcome to ⛲ Fountain Protocol
         </h2>
-        <p className="text-xl text-slate-600 max-w-2xl mx-auto">
+        <p className="text-xl fountain-text-secondary max-w-3xl mx-auto leading-relaxed">
           A sustainable DeFi protocol built on Hedera Hashgraph featuring membership tokens (💦 $DRIP), 
           utility tokens (✨ $WISH), and donor recognition tokens (💧 $DROP).
         </p>
 
         {/* Investment Highlight */}
-        <div className="bg-gradient-to-r from-blue-500 to-purple-600 text-white p-6 rounded-xl max-w-lg mx-auto">
-          <div className="text-lg font-semibold mb-2">💰 Investment Opportunity</div>
-          <div className="text-2xl font-bold">1 ℏ HBAR → 1.8 ℏ HBAR</div>
-          <div className="text-blue-100 mt-1">0.8 ℏ HBAR profit per cycle (80% ROI)</div>
+        <div className="bg-gradient-to-br from-water-700 via-sky-500 to-water-700 text-white p-8 rounded-3xl max-w-2xl mx-auto shadow-xl">
+          <div className="text-lg font-medium mb-3 text-blue-100">💰 Investment Opportunity</div>
+          <div className="text-3xl font-bold mb-2">1 ℏ HBAR → 1.8 ℏ HBAR</div>
+          <div className="text-blue-100 text-lg">0.8 ℏ HBAR profit per cycle (80% ROI)</div>
         </div>
 
         <button 
@@ -36,54 +36,54 @@ const WelcomeSection: React.FC<WelcomeSectionProps> = ({ onConnectWallet }) => {
       </div>
 
       {/* Protocol Statistics */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <div className="fountain-card p-6">
-          <div className="text-3xl font-bold text-slate-900">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+        <div className="fountain-card p-8 text-center">
+          <div className="text-4xl font-bold fountain-text-primary mb-2">
             {protocolStats?.totalMembers || 6}
           </div>
-          <div className="text-slate-600 mt-1">Active Members</div>
+          <div className="fountain-text-secondary">Active Members</div>
         </div>
         
-        <div className="fountain-card p-6">
-          <div className="text-3xl font-bold text-slate-900">
+        <div className="fountain-card p-8 text-center">
+          <div className="text-4xl font-bold fountain-text-primary mb-2">
             {protocolStats?.totalHbar || 952.64}
           </div>
-          <div className="text-slate-600 mt-1">ℏ [HBAR] in Treasury</div>
+          <div className="fountain-text-secondary">ℏ [HBAR] in Treasury</div>
         </div>
         
-        <div className="fountain-card p-6">
-          <div className="text-3xl font-bold text-slate-900">
+        <div className="fountain-card p-8 text-center">
+          <div className="text-4xl font-bold fountain-text-primary mb-2">
             {formatNumber(protocolStats?.totalWish || 0)}
           </div>
-          <div className="text-slate-600 mt-1">✨ WISH Tokens</div>
+          <div className="fountain-text-secondary">✨ WISH Tokens</div>
         </div>
       </div>
 
       {/* How It Works */}
-      <div className="space-y-8">
-        <h3 className="text-2xl font-bold text-slate-900">How It Works</h3>
+      <div className="space-y-10">
+        <h3 className="text-3xl font-bold fountain-text-primary">How It Works</h3>
         
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          <div className="fountain-card p-6 text-center">
-            <div className="text-3xl mb-4">1</div>
-            <h4 className="font-semibold text-lg mb-2">Join Protocol</h4>
-            <p className="text-slate-600">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+          <div className="fountain-card p-8 text-center">
+            <div className="w-16 h-16 bg-gradient-to-br from-water-700 to-sky-500 rounded-full flex items-center justify-center text-white text-2xl font-bold mx-auto mb-6">1</div>
+            <h4 className="fountain-text-primary text-xl font-semibold mb-3">Join Protocol</h4>
+            <p className="fountain-text-secondary leading-relaxed">
               Deposit 1 ℏ [HBAR] to receive 💦 DRIP membership token
             </p>
           </div>
           
-          <div className="fountain-card p-6 text-center">
-            <div className="text-3xl mb-4">2</div>
-            <h4 className="font-semibold text-lg mb-2">Earn ✨ WISH</h4>
-            <p className="text-slate-600">
+          <div className="fountain-card p-8 text-center">
+            <div className="w-16 h-16 bg-gradient-to-br from-water-700 to-sky-500 rounded-full flex items-center justify-center text-white text-2xl font-bold mx-auto mb-6">2</div>
+            <h4 className="fountain-text-primary text-xl font-semibold mb-3">Earn ✨ WISH</h4>
+            <p className="fountain-text-secondary leading-relaxed">
               Receive 50 ✨ WISH tokens daily (75 with 💧 DROP bonus)
             </p>
           </div>
           
-          <div className="fountain-card p-6 text-center">
-            <div className="text-3xl mb-4">3</div>
-            <h4 className="font-semibold text-lg mb-2">AutoRedeem</h4>
-            <p className="text-slate-600">
+          <div className="fountain-card p-8 text-center">
+            <div className="w-16 h-16 bg-gradient-to-br from-water-700 to-sky-500 rounded-full flex items-center justify-center text-white text-2xl font-bold mx-auto mb-6">3</div>
+            <h4 className="fountain-text-primary text-xl font-semibold mb-3">AutoRedeem</h4>
+            <p className="fountain-text-secondary leading-relaxed">
               Burn 1000 ✨ WISH → Get 1.8 ℏ [HBAR] + new membership (0.8 ℏ [HBAR] profit)
             </p>
           </div>
