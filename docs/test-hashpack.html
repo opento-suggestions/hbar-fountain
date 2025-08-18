@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HashPack Connection Test</title>
+    <script src="https://unpkg.com/hashconnect@3.0.14/dist/hashconnect.min.js"></script>
+    <style>
+        body { font-family: Arial, sans-serif; padding: 20px; }
+        button { padding: 10px 20px; margin: 10px; cursor: pointer; }
+        #status { margin-top: 20px; padding: 10px; background: #f0f0f0; }
+        .log { margin: 5px 0; padding: 5px; background: white; border-left: 3px solid #007bff; }
+    </style>
+</head>
+<body>
+    <h1>HashPack Connection Test</h1>
+    <button onclick="testHashConnect()">Test HashConnect Library</button>
+    <button onclick="connectHashPack()">Connect HashPack</button>
+    <div id="status"></div>
+
+    <script>
+        const statusDiv = document.getElementById('status');
+        
+        function log(message, type = 'info') {
+            const logDiv = document.createElement('div');
+            logDiv.className = 'log';
+            logDiv.style.borderColor = type === 'error' ? '#dc3545' : type === 'success' ? '#28a745' : '#007bff';
+            logDiv.textContent = `[${new Date().toLocaleTimeString()}] ${message}`;
+            statusDiv.appendChild(logDiv);
+            console.log(message);
+        }
+        
+        function testHashConnect() {
+            statusDiv.innerHTML = '';
+            
+            // Check if HashConnect is loaded
+            if (window.HashConnect) {
+                log('✅ HashConnect library is loaded', 'success');
+                log('HashConnect version: ' + (window.HashConnect.version || 'Unknown'));
+                
+                // Try to create an instance
+                try {
+                    const hc = new window.HashConnect();
+                    log('✅ HashConnect instance created successfully', 'success');
+                } catch (error) {
+                    log('❌ Failed to create HashConnect instance: ' + error.message, 'error');
+                }
+            } else {
+                log('❌ HashConnect library not found on window object', 'error');
+                log('Available window properties: ' + Object.keys(window).filter(k => k.toLowerCase().includes('hash')).join(', '));
+            }
+        }
+        
+        async function connectHashPack() {
+            statusDiv.innerHTML = '';
+            log('Starting HashPack connection...');
+            
+            try {
+                if (!window.HashConnect) {
+                    throw new Error('HashConnect library not loaded');
+                }
+                
+                const hashconnect = new window.HashConnect();
+                log('HashConnect instance created');
+                
+                const appMetadata = {
+                    name: "Fountain Protocol Test",
+                    description: "Testing HashPack connection",
+                    url: window.location.origin,
+                    icon: window.location.origin + "/icon.png"
+                };
+                
+                log('Initializing with app metadata...');
+                const initData = await hashconnect.init(appMetadata, "testnet", false);
+                log('HashConnect initialized');
+                
+                if (initData.savedPairings && initData.savedPairings.length > 0) {
+                    log('Found saved pairings: ' + initData.savedPairings.length);
+                }
+                
+                // Set up event listeners
+                hashconnect.foundExtensionEvent.once((walletMetadata) => {
+                    log('✅ HashPack extension found!', 'success');
+                    log('Wallet: ' + walletMetadata.name + ' v' + walletMetadata.version);
+                });
+                
+                hashconnect.pairingEvent.once((pairingData) => {
+                    log('✅ Successfully paired with wallet!', 'success');
+                    log('Account: ' + pairingData.accountIds[0]);
+                    log('Network: ' + pairingData.network);
+                });
+                
+                hashconnect.connectionStatusChangeEvent.on((status) => {
+                    log('Connection status: ' + status);
+                });
+                
+                log('Attempting to connect to local wallet...');
+                hashconnect.connectToLocalWallet();
+                
+                // Also try to check if extension is available
+                setTimeout(() => {
+                    if (hashconnect.hcData.foundExtensionVersion) {
+                        log('Extension version: ' + hashconnect.hcData.foundExtensionVersion);
+                    } else {
+                        log('⚠️ No HashPack extension detected after 2 seconds', 'error');
+                        log('Make sure HashPack extension is installed and unlocked');
+                    }
+                }, 2000);
+                
+            } catch (error) {
+                log('❌ Error: ' + error.message, 'error');
+                console.error(error);
+            }
+        }
+        
+        // Test on page load
+        window.addEventListener('load', () => {
+            testHashConnect();
+        });
+    </script>
+</body>
+</html>

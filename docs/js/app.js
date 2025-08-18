@@ -236,10 +236,23 @@ class FountainProtocolApp {
                 // handleWalletConnect will be called automatically via event
             } else {
                 this.hideTransactionModal();
-                this.showError(result.error || 'Failed to connect wallet');
+                console.error('Wallet connection failed:', result);
+                
+                // Provide more helpful error messages
+                let errorMessage = result.error || 'Failed to connect wallet';
+                if (walletType === 'hashpack' && errorMessage.includes('not found')) {
+                    errorMessage = 'HashPack connection failed. Please ensure:\n\n' +
+                        '1. HashPack extension is installed\n' +
+                        '2. HashPack is unlocked\n' +
+                        '3. You have a Testnet account in HashPack\n\n' +
+                        'Try refreshing the page and connecting again.';
+                }
+                
+                this.showError(errorMessage);
             }
         } catch (error) {
             this.hideTransactionModal();
+            console.error('Wallet connection error:', error);
             this.showError(error.message);
         }
     }
