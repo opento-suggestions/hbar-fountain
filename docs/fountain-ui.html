@@ -7,8 +7,8 @@
     <link rel="stylesheet" href="css/fountain.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     
-    <!-- HashConnect for HashPack Integration -->
-    <script src="https://unpkg.com/hashconnect@3.0.14/dist/hashconnect.min.js"></script>
+    <!-- Skip HashConnect CDN - it requires module support -->
+    <!-- We'll use direct HashPack extension API instead -->
 </head>
 <body>
     <div class="app-container">
@@ -244,6 +244,8 @@
 
     <!-- Scripts -->
     <script src="js/constants.js"></script>
+    <script src="js/hashconnect-proper.js"></script>
+    <script src="js/hashpack-simple.js"></script>
     <script src="js/wallet-connect.js"></script>
     <script src="js/protocol-client.js"></script>
     <script src="js/ui-components.js"></script>

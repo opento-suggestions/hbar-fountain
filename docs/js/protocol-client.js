@@ -12,15 +12,23 @@ class FountainProtocolClient {
     async initialize() {
         console.log('🌊 Initializing Fountain Protocol Client');
         
-        // Start periodic updates when wallet is connected
-        this.walletManager.on('onConnect', () => {
-            this.startPeriodicUpdates();
-        });
+        // Check if walletManager exists
+        if (!this.walletManager) {
+            console.warn('WalletManager not initialized yet, creating new instance');
+            this.walletManager = window.walletManager || new WalletManager();
+        }
         
-        this.walletManager.on('onDisconnect', () => {
-            this.stopPeriodicUpdates();
-            this.clearCache();
-        });
+        // Start periodic updates when wallet is connected
+        if (this.walletManager && this.walletManager.on) {
+            this.walletManager.on('onConnect', () => {
+                this.startPeriodicUpdates();
+            });
+            
+            this.walletManager.on('onDisconnect', () => {
+                this.stopPeriodicUpdates();
+                this.clearCache();
+            });
+        }
     }
 
     // Start periodic data updates
