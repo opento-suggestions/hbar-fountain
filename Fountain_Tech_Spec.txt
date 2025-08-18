@@ -1,0 +1,102 @@
+Fountain Protocol — Official Hedera
+Specs & Docs (HTS / HCS / EVM)
+Last updated: 2025-08-17 (UTC)
+1) HTS: Token Keys, Freeze/Pause/
+Wipe, Native Tokenization
+- HTS Native Tokenization (overview):
+ https://docs.hedera.com/hedera/coreconcepts/tokens/hedera-tokenservice-hts-native-tokenization
+- Create a token (keys overview &
+setup):
+ https://docs.hedera.com/hedera/
+sdks-and-apis/sdks/token-service/
+define-a-token
+- Freeze an account (per-account
+freeze semantics):
+ https://docs.hedera.com/hedera/
+sdks-and-apis/sdks/token-service/
+freeze-an-account
+- Unfreeze (API reference):
+ https://docs.hedera.com/hedera/
+sdks-and-apis/hedera-api/tokenservice/tokenunfreezeaccount
+- Pause a token (global pause):
+ https://docs.hedera.com/hedera/
+sdks-and-apis/sdks/token-service/
+pause-a-token
+- TokenPause (API reference):
+ https://docs.hedera.com/hedera/
+sdks-and-apis/hedera-api/tokenservice/tokenpause
+- Wipe a token (burn from account):
+ https://docs.hedera.com/hedera/
+sdks-and-apis/sdks/token-service/
+wipe-a-token
+- Tutorial: Pause/Freeze/Wipe (HTS x
+EVM):
+ https://docs.hedera.com/hedera/
+tutorials/smart-contracts/hts-x-evm-
+part-3-how-to-pause-freeze-wipeand-delete-nfts
+2) HTS x EVM (Precompile 0x167) and
+ERC-20 on Hedera
+- System Smart Contracts (HTS
+precompile; address 0x167 + repo):
+ https://docs.hedera.com/hedera/coreconcepts/smart-contracts/systemsmart-contracts
+- HIP-206: HTS Precompiled Contract
+(design spec):
+ https://hips.hedera.com/HIP/
+hip-206.html
+- ERC-20 on Hedera (tokens managed
+by smart contracts):
+ https://docs.hedera.com/hedera/coreconcepts/smart-contracts/tokensmanaged-by-smart-contracts/erc-20-
+fungible-tokens
+- ERC/EVM-Compatible Tokenization
+(facade contracts):
+ https://docs.hedera.com/hedera/coreconcepts/tokens/erc-evm-compatibletokenization
+3) HCS: Topics & Messages (for daily
+tuples)
+- Create a Topic (Consensus Service):
+ https://docs.hedera.com/hedera/
+sdks-and-apis/sdks/consensusservice/create-a-topic
+- Submit a Message:
+ https://docs.hedera.com/hedera/
+sdks-and-apis/sdks/consensusservice/submit-a-message
+- Tutorial: Submit your first message:
+ https://docs.hedera.com/hedera/
+tutorials/consensus/submit-your-firstmessage
+4) Mirror Node REST API (for holders,
+balances, topics)
+- REST API Overview:
+ https://docs.hedera.com/hedera/
+sdks-and-apis/rest-api
+- Balances endpoint (accounts
+snapshot):
+ https://docs.hedera.com/hedera/
+sdks-and-apis/rest-api/balances
+- Tokens endpoints (details, balances,
+NFTs, tx history):
+ https://docs.hedera.com/hedera/
+sdks-and-apis/rest-api/tokens
+- Mirror Nodes (concepts):
+ https://docs.hedera.com/hedera/coreconcepts/mirror-nodes
+5) Wallet Integration (HashPack /
+WalletConnect / HashConnect)
+- HashConnect (library repo):
+ https://github.com/Hashpack/
+hashconnect
+- HashPack WalletConnect docs:
+ https://docs.hashpack.app/dappdevelopers/walletconnect
+- HashPack Developers hub:
+ https://www.hashpack.app/developers
+6) DEX Context (SaucerSwap on
+Hedera)
+- SaucerSwap Docs:
+ https://docs.saucerswap.finance/
+- SaucerSwap V2 Whitepaper (PDF):
+ https://www.saucerswap.finance/
+whitepaper-v2.pdf
+Notes:
+- Use testnet Mirror base: https://
+testnet.mirrornode.hedera.com
+- For precompile usage (HTS in
+Solidity), reference the system
+contract IHederaTokenService in the
+official repo linked from the system
+smart contracts page.

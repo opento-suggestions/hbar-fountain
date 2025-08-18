@@ -1,0 +1,84 @@
+{
+  "generatedAt": "2025-08-18T03:45:00.000Z",
+  "period": "7 days",
+  "snapshots": [
+    {
+      "snapshotDate": "2025-08-12",
+      "metrics": {
+        "totalDripHolders": 41,
+        "newDonorsToday": 1,
+        "finalEntitlement": 50,
+        "growthMultiplier": 1.0,
+        "totalWishToAllocate": 2050,
+        "growthRate": 0.0244
+      }
+    },
+    {
+      "snapshotDate": "2025-08-13",
+      "metrics": {
+        "totalDripHolders": 42,
+        "newDonorsToday": 2,
+        "finalEntitlement": 55,
+        "growthMultiplier": 1.1,
+        "totalWishToAllocate": 2310,
+        "growthRate": 0.0244
+      }
+    },
+    {
+      "snapshotDate": "2025-08-14",
+      "metrics": {
+        "totalDripHolders": 43,
+        "newDonorsToday": 0,
+        "finalEntitlement": 55,
+        "growthMultiplier": 1.1,
+        "totalWishToAllocate": 2365,
+        "growthRate": 0.0238
+      }
+    },
+    {
+      "snapshotDate": "2025-08-15",
+      "metrics": {
+        "totalDripHolders": 44,
+        "newDonorsToday": 1,
+        "finalEntitlement": 55,
+        "growthMultiplier": 1.1,
+        "totalWishToAllocate": 2420,
+        "growthRate": 0.0233
+      }
+    },
+    {
+      "snapshotDate": "2025-08-16",
+      "metrics": {
+        "totalDripHolders": 45,
+        "newDonorsToday": 2,
+        "finalEntitlement": 58,
+        "growthMultiplier": 1.15,
+        "totalWishToAllocate": 2610,
+        "growthRate": 0.0227
+      }
+    },
+    {
+      "snapshotDate": "2025-08-17",
+      "metrics": {
+        "totalDripHolders": 46,
+        "newDonorsToday": 1,
+        "finalEntitlement": 58,
+        "growthMultiplier": 1.15,
+        "totalWishToAllocate": 2668,
+        "growthRate": 0.0222
+      }
+    },
+    {
+      "snapshotDate": "2025-08-18",
+      "metrics": {
+        "totalDripHolders": 47,
+        "newDonorsToday": 3,
+        "finalEntitlement": 60,
+        "growthMultiplier": 1.2,
+        "totalWishToAllocate": 2350,
+        "growthRate": 0.0426
+      }
+    }
+  ],
+  "totalSnapshots": 7
+}

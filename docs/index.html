@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fountain Protocol Dashboard</title>
+    <link rel="stylesheet" href="styles.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+</head>
+<body>
+    <div class="container">
+        <header class="header">
+            <div class="header-content">
+                <div class="logo">
+                    <i class="fas fa-tint"></i>
+                    <h1>Fountain Protocol</h1>
+                </div>
+                <div class="network-badge">
+                    <span class="network-indicator testnet">Testnet</span>
+                    <span class="last-update" id="lastUpdate">Loading...</span>
+                </div>
+            </div>
+        </header>
+
+        <main class="main-content">
+            <!-- Protocol Status Cards -->
+            <section class="status-cards">
+                <div class="card">
+                    <div class="card-header">
+                        <i class="fas fa-users"></i>
+                        <h3>Active Members</h3>
+                    </div>
+                    <div class="card-content">
+                        <div class="metric-value" id="activeDripHolders">--</div>
+                        <div class="metric-label">Total $DRIP Holders</div>
+                        <div class="growth-indicator" id="memberGrowth">--</div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <i class="fas fa-coins"></i>
+                        <h3>Daily Entitlement</h3>
+                    </div>
+                    <div class="card-content">
+                        <div class="metric-value" id="dailyEntitlement">--</div>
+                        <div class="metric-label">$WISH per Member</div>
+                        <div class="formula-hint">Base: 50 + Booster × Multiplier</div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <i class="fas fa-chart-line"></i>
+                        <h3>Growth Multiplier</h3>
+                    </div>
+                    <div class="card-content">
+                        <div class="metric-value" id="growthMultiplier">--</div>
+                        <div class="metric-label">Current Multiplier</div>
+                        <div class="range-indicator">Range: 1.0 - 1.5</div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <i class="fas fa-heart"></i>
+                        <h3>New Donors</h3>
+                    </div>
+                    <div class="card-content">
+                        <div class="metric-value" id="newDonors">--</div>
+                        <div class="metric-label">Today's $DROP Recipients</div>
+                        <div class="donor-booster" id="donorBooster">Booster: --</div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Protocol Economics -->
+            <section class="economics-section">
+                <div class="card wide">
+                    <div class="card-header">
+                        <i class="fas fa-calculator"></i>
+                        <h3>Today's Economics</h3>
+                    </div>
+                    <div class="card-content economics-grid">
+                        <div class="economic-metric">
+                            <label>Total $WISH Allocated</label>
+                            <value id="totalWishAllocated">--</value>
+                        </div>
+                        <div class="economic-metric">
+                            <label>Total Value (HBAR)</label>
+                            <value id="totalHbarValue">--</value>
+                        </div>
+                        <div class="economic-metric">
+                            <label>Growth Rate</label>
+                            <value id="growthRate">--</value>
+                        </div>
+                        <div class="economic-metric">
+                            <label>Cumulative Score</label>
+                            <value id="cumulativeScore">--</value>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Mathematical Formulas -->
+            <section class="formulas-section">
+                <div class="card wide">
+                    <div class="card-header">
+                        <i class="fas fa-function"></i>
+                        <h3>Protocol Mathematics</h3>
+                    </div>
+                    <div class="card-content">
+                        <div class="formula-grid">
+                            <div class="formula-item">
+                                <h4>Growth Rate</h4>
+                                <code>gt = (Nt - Nt-1) / Nt-1</code>
+                                <p>Where Nt = current holders, Nt-1 = previous holders</p>
+                            </div>
+                            <div class="formula-item">
+                                <h4>Cumulative Score</h4>
+                                <code>C += 0.1 if gt ≥ 2%</code>
+                                <p>Growth threshold triggers score increase</p>
+                            </div>
+                            <div class="formula-item">
+                                <h4>Growth Multiplier</h4>
+                                <code>Mt = min(1 + C, 1.5)</code>
+                                <p>Capped at 1.5x maximum multiplier</p>
+                            </div>
+                            <div class="formula-item">
+                                <h4>Donor Booster</h4>
+                                <code>Bt = min(floor(50 × ((Dt/Nt) - 1)), 25)</code>
+                                <p>When Dt > Nt (more donors than members)</p>
+                            </div>
+                            <div class="formula-item">
+                                <h4>Final Entitlement</h4>
+                                <code>Et = floor((50 + Bt) × Mt)</code>
+                                <p>Daily $WISH per $DRIP holder</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Historical Chart -->
+            <section class="chart-section">
+                <div class="card wide">
+                    <div class="card-header">
+                        <i class="fas fa-chart-area"></i>
+                        <h3>7-Day History</h3>
+                    </div>
+                    <div class="card-content">
+                        <canvas id="historyChart" width="800" height="300"></canvas>
+                    </div>
+                </div>
+            </section>
+
+            <!-- HCS Integration Status -->
+            <section class="hcs-section">
+                <div class="card wide">
+                    <div class="card-header">
+                        <i class="fas fa-network-wired"></i>
+                        <h3>HCS Integration Status</h3>
+                    </div>
+                    <div class="card-content">
+                        <div class="hcs-status">
+                            <div class="hcs-metric">
+                                <label>Topic ID</label>
+                                <value id="hcsTopicId">0.0.6591043</value>
+                            </div>
+                            <div class="hcs-metric">
+                                <label>Last Message</label>
+                                <value id="lastHcsMessage">--</value>
+                            </div>
+                            <div class="hcs-metric">
+                                <label>Message Count</label>
+                                <value id="hcsMessageCount">--</value>
+                            </div>
+                            <div class="hcs-metric">
+                                <label>Connection Status</label>
+                                <value id="hcsStatus" class="status-indicator">--</value>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </main>
+
+        <footer class="footer">
+            <div class="footer-content">
+                <div class="footer-links">
+                    <a href="https://hashscan.io/testnet/topic/0.0.6591043" target="_blank">
+                        <i class="fas fa-external-link-alt"></i>
+                        View HCS Topic
+                    </a>
+                    <a href="https://github.com/opento-suggestions/hbar-fountain" target="_blank">
+                        <i class="fab fa-github"></i>
+                        Source Code
+                    </a>
+                </div>
+                <div class="footer-info">
+                    <p>Fountain Protocol - Decentralized on Hedera Testnet</p>
+                    <p>Data sourced from HCS Topic 0.0.6591043</p>
+                </div>
+            </div>
+        </footer>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="dashboard.js"></script>
+</body>
+</html>

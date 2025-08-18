@@ -88,6 +88,8 @@ const CONFIG = {
     // AutoRelease Split 
     treasuryFee: 0.2,                 // 0.2 HBAR fee on lifecycle end
     memberRefund: 0.8,                // 0.8 HBAR refund to member
+    treasuryBonus: 1.0,               // 1.0 HBAR bonus payment from Treasury
+    totalMemberPayout: 1.8,           // Total member receives: 0.8 refund + 1.0 bonus
     
     // Donation Parameters
     minDonationThreshold: 1000000,    // 0.01 HBAR minimum for DROP
@@ -211,6 +213,10 @@ function validateConfig() {
   // Validate mathematical consistency
   if (CONFIG.parameters.treasuryFee + CONFIG.parameters.memberRefund !== 1.0) {
     throw new Error('Treasury fee + member refund must equal 1.0');
+  }
+  
+  if (CONFIG.parameters.memberRefund + CONFIG.parameters.treasuryBonus !== CONFIG.parameters.totalMemberPayout) {
+    throw new Error('Member refund + treasury bonus must equal total member payout');
   }
   
   if (CONFIG.parameters.maxWishPerDrip <= 0) {

@@ -1,0 +1,10 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(npm install:*)",
+      "WebFetch(domain:docs.hedera.com)"
+    ],
+    "deny": [],
+    "ask": []
+  }
+}

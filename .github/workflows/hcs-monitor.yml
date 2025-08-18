@@ -1,0 +1,306 @@
+name: HCS Topic Monitor & Dashboard Update
+
+on:
+  schedule:
+    # Run every 15 minutes to check for new HCS messages
+    - cron: '*/15 * * * *'
+  workflow_dispatch:
+    # Allow manual triggering
+  push:
+    branches: [ main ]
+    paths: 
+      - '.github/workflows/hcs-monitor.yml'
+      - 'scripts/hcs-monitor.js'
+
+jobs:
+  monitor-hcs-and-update-dashboard:
+    runs-on: ubuntu-latest
+    
+    permissions:
+      contents: write
+      pages: write
+      id-token: write
+    
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+      with:
+        token: ${{ secrets.GITHUB_TOKEN }}
+    
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '18'
+        cache: 'npm'
+    
+    - name: Install dependencies
+      run: |
+        npm install @hashgraph/sdk dotenv
+    
+    - name: Create HCS Monitor Script
+      run: |
+        mkdir -p scripts
+        cat > scripts/hcs-monitor.js << 'EOF'
+        /**
+         * HCS Topic Monitor for GitHub Actions
+         * Fetches latest messages from Fountain Protocol HCS Topic 0.0.6591043
+         * Generates JSON data files for GitHub Pages dashboard
+         */
+        
+        const { Client, TopicMessageQuery, TopicId } = require('@hashgraph/sdk');
+        const fs = require('fs').promises;
+        const path = require('path');
+        
+        class HCSMonitor {
+            constructor() {
+                this.client = Client.forTestnet();
+                this.topicId = '0.0.6591043';
+                this.outputDir = 'docs';
+                this.maxHistoryDays = 7;
+            }
+        
+            async run() {
+                console.log('🔍 Starting HCS Topic Monitor...');
+                console.log(`📡 Monitoring topic: ${this.topicId}`);
+                
+                try {
+                    await this.fetchLatestMessages();
+                    console.log('✅ HCS monitoring completed successfully');
+                } catch (error) {
+                    console.error('❌ HCS monitoring failed:', error);
+                    process.exit(1);
+                } finally {
+                    this.client.close();
+                }
+            }
+        
+            async fetchLatestMessages() {
+                const messages = [];
+                let messageCount = 0;
+                
+                console.log('📥 Fetching HCS messages...');
+                
+                return new Promise((resolve, reject) => {
+                    const query = new TopicMessageQuery()
+                        .setTopicId(this.topicId)
+                        .setLimit(100) // Get last 100 messages
+                        .setStartTime(this.getStartTime());
+                    
+                    const subscription = query.subscribe(
+                        this.client,
+                        null,
+                        (message) => {
+                            try {
+                                messageCount++;
+                                const messageData = {
+                                    sequenceNumber: message.sequenceNumber.toString(),
+                                    consensusTimestamp: message.consensusTimestamp.toDate().toISOString(),
+                                    runningHash: message.runningHash.toString(),
+                                    contents: message.contents.toString('utf8')
+                                };
+                                
+                                // Try to parse as JSON (Fountain Protocol messages)
+                                try {
+                                    const parsedContent = JSON.parse(messageData.contents);
+                                    if (parsedContent.protocol === 'Fountain Protocol' && 
+                                        parsedContent.type === 'daily_snapshot') {
+                                        messageData.protocolData = parsedContent;
+                                        console.log(`📊 Found daily snapshot: ${parsedContent.snapshotDate}`);
+                                    }
+                                } catch (parseError) {
+                                    // Not JSON or not a protocol message, keep as raw text
+                                }
+                                
+                                messages.push(messageData);
+                                
+                            } catch (error) {
+                                console.warn('⚠️ Error processing message:', error);
+                            }
+                        },
+                        (error) => {
+                            console.error('❌ HCS subscription error:', error);
+                            reject(error);
+                        }
+                    );
+                    
+                    // Complete after a timeout or when we have enough data
+                    setTimeout(() => {
+                        subscription.unsubscribe();
+                        console.log(`📨 Processed ${messageCount} messages`);
+                        
+                        this.processMessages(messages)
+                            .then(resolve)
+                            .catch(reject);
+                    }, 10000); // 10 second timeout
+                });
+            }
+        
+            async processMessages(messages) {
+                console.log('🔄 Processing messages and generating dashboard data...');
+                
+                // Filter for Fountain Protocol daily snapshots
+                const protocolSnapshots = messages
+                    .filter(m => m.protocolData && m.protocolData.type === 'daily_snapshot')
+                    .sort((a, b) => new Date(a.consensusTimestamp) - new Date(b.consensusTimestamp));
+                
+                console.log(`📊 Found ${protocolSnapshots.length} protocol snapshots`);
+                
+                // Generate current protocol data
+                const latestSnapshot = protocolSnapshots[protocolSnapshots.length - 1];
+                const protocolData = {
+                    lastUpdated: new Date().toISOString(),
+                    latestSnapshot: latestSnapshot?.protocolData || null,
+                    lastHCSMessage: latestSnapshot?.consensusTimestamp || null,
+                    totalMessages: messages.length,
+                    topicId: this.topicId,
+                    source: 'hcs-github-actions'
+                };
+                
+                // Generate historical data (last 7 days)
+                const cutoffDate = new Date();
+                cutoffDate.setDate(cutoffDate.getDate() - this.maxHistoryDays);
+                
+                const recentSnapshots = protocolSnapshots.filter(m => 
+                    new Date(m.consensusTimestamp) >= cutoffDate
+                );
+                
+                const historyData = {
+                    generatedAt: new Date().toISOString(),
+                    period: `${this.maxHistoryDays} days`,
+                    snapshots: recentSnapshots.map(m => m.protocolData),
+                    totalSnapshots: recentSnapshots.length
+                };
+                
+                // Write data files
+                await this.writeDataFiles(protocolData, historyData);
+                
+                // Generate summary for GitHub Actions
+                this.generateActionsSummary(protocolData, historyData);
+            }
+        
+            async writeDataFiles(protocolData, historyData) {
+                try {
+                    // Ensure output directory exists
+                    await fs.mkdir(this.outputDir, { recursive: true });
+                    
+                    // Write current protocol data
+                    const protocolPath = path.join(this.outputDir, 'protocol-data.json');
+                    await fs.writeFile(protocolPath, JSON.stringify(protocolData, null, 2));
+                    console.log(`✅ Written protocol data to ${protocolPath}`);
+                    
+                    // Write historical data
+                    const historyPath = path.join(this.outputDir, 'protocol-history.json');
+                    await fs.writeFile(historyPath, JSON.stringify(historyData, null, 2));
+                    console.log(`✅ Written history data to ${historyPath}`);
+                    
+                    // Write metadata for GitHub Pages
+                    const metadata = {
+                        lastBuild: new Date().toISOString(),
+                        topicId: this.topicId,
+                        hasLatestSnapshot: !!protocolData.latestSnapshot,
+                        snapshotsFound: historyData.totalSnapshots,
+                        dataFiles: ['protocol-data.json', 'protocol-history.json']
+                    };
+                    
+                    const metadataPath = path.join(this.outputDir, 'build-metadata.json');
+                    await fs.writeFile(metadataPath, JSON.stringify(metadata, null, 2));
+                    console.log(`✅ Written metadata to ${metadataPath}`);
+                    
+                } catch (error) {
+                    console.error('❌ Failed to write data files:', error);
+                    throw error;
+                }
+            }
+        
+            generateActionsSummary(protocolData, historyData) {
+                const latestSnapshot = protocolData.latestSnapshot;
+                
+                if (latestSnapshot && latestSnapshot.metrics) {
+                    const metrics = latestSnapshot.metrics;
+                    console.log('📊 PROTOCOL SUMMARY:');
+                    console.log(`   Date: ${latestSnapshot.snapshotDate}`);
+                    console.log(`   Active Members: ${metrics.totalDripHolders || 'N/A'}`);
+                    console.log(`   Daily Entitlement: ${metrics.finalEntitlement || 'N/A'} WISH`);
+                    console.log(`   Growth Multiplier: ${metrics.growthMultiplier || 'N/A'}x`);
+                    console.log(`   New Donors: ${metrics.newDonorsToday || 'N/A'}`);
+                    console.log(`   Total WISH Allocated: ${metrics.totalWishToAllocate || 'N/A'}`);
+                } else {
+                    console.log('⚠️ No recent protocol snapshots found');
+                }
+                
+                console.log(`📈 Historical data: ${historyData.totalSnapshots} snapshots over ${historyData.period}`);
+            }
+        
+            getStartTime() {
+                // Get messages from last 24 hours
+                const startTime = new Date();
+                startTime.setHours(startTime.getHours() - 24);
+                return startTime;
+            }
+        }
+        
+        // Run the monitor
+        const monitor = new HCSMonitor();
+        monitor.run();
+        EOF
+    
+    - name: Run HCS Monitor
+      run: |
+        cd scripts
+        node hcs-monitor.js
+    
+    - name: Commit and push data files
+      run: |
+        git config --local user.email "action@github.com"
+        git config --local user.name "GitHub Action"
+        git add docs/*.json
+        
+        if git diff --staged --quiet; then
+          echo "No changes to commit"
+        else
+          git commit -m "Update protocol data from HCS topic $(date -u +'%Y-%m-%d %H:%M:%S UTC')"
+          git push
+        fi
+    
+    - name: Setup GitHub Pages
+      if: github.ref == 'refs/heads/main'
+      uses: actions/configure-pages@v4
+    
+    - name: Upload Pages artifact
+      if: github.ref == 'refs/heads/main'
+      uses: actions/upload-pages-artifact@v2
+      with:
+        path: docs
+    
+    - name: Deploy to GitHub Pages
+      if: github.ref == 'refs/heads/main'
+      id: deployment
+      uses: actions/deploy-pages@v3
+
+  # Job summary
+  notify-completion:
+    needs: monitor-hcs-and-update-dashboard
+    runs-on: ubuntu-latest
+    if: always()
+    
+    steps:
+    - name: Job Summary
+      run: |
+        echo "## 🌊 Fountain Protocol Dashboard Update" >> $GITHUB_STEP_SUMMARY
+        echo "" >> $GITHUB_STEP_SUMMARY
+        echo "**Timestamp:** $(date -u +'%Y-%m-%d %H:%M:%S UTC')" >> $GITHUB_STEP_SUMMARY
+        echo "**HCS Topic:** 0.0.6591043" >> $GITHUB_STEP_SUMMARY
+        echo "" >> $GITHUB_STEP_SUMMARY
+        
+        if [ "${{ needs.monitor-hcs-and-update-dashboard.result }}" == "success" ]; then
+          echo "✅ **Status:** Dashboard updated successfully" >> $GITHUB_STEP_SUMMARY
+          echo "🔗 **Dashboard:** [View Live Dashboard](https://opento-suggestions.github.io/hbar-fountain/)" >> $GITHUB_STEP_SUMMARY
+        else
+          echo "❌ **Status:** Dashboard update failed" >> $GITHUB_STEP_SUMMARY
+        fi
+        
+        echo "" >> $GITHUB_STEP_SUMMARY
+        echo "📊 **Data Sources:**" >> $GITHUB_STEP_SUMMARY
+        echo "- HCS Topic messages (real-time)" >> $GITHUB_STEP_SUMMARY
+        echo "- Daily snapshots (protocol metrics)" >> $GITHUB_STEP_SUMMARY
+        echo "- GitHub Actions (automated updates)" >> $GITHUB_STEP_SUMMARY
