@@ -37,20 +37,20 @@ jobs:
       run: |
         echo "Using built-in Node.js modules only"
     
-    - name: Create Simplified HCS Monitor Script
+    - name: Create Enhanced HCS Monitor Script  
       run: |
         mkdir -p scripts
         cat > scripts/hcs-monitor.js << 'EOF'
         /**
-         * Simplified HCS Topic Monitor for GitHub Actions
-         * Uses Mirror Node API instead of direct HCS subscription for better reliability
+         * Enhanced HCS Topic Monitor that properly handles chunked messages
+         * Uses Mirror Node API to reconstruct chunked protocol messages
          */
         
         import https from 'https';
         import { promises as fs } from 'fs';
         import path from 'path';
         
-        class HCSMonitor {
+        class EnhancedHCSMonitor {
             constructor() {
                 this.topicId = '0.0.6591043';
                 this.outputDir = 'docs';
@@ -331,8 +331,8 @@ jobs:
             }
         }
         
-        // Run the monitor
-        const monitor = new HCSMonitor();
+        // Run the enhanced monitor
+        const monitor = new EnhancedHCSMonitor();
         monitor.run();
         EOF
     

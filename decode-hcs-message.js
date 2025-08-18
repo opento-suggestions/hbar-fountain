@@ -1,0 +1,10 @@
+// Quick script to decode the most recent HCS message
+const message = "ewogICJwcm90b2NvbCI6ICJGb3VudGFpbiBQcm90b2NvbCIsCiAgInZlcnNpb24iOiAiMS4wIiwKICAidHlwZSI6ICJkYWlseV9zbmFwc2hvdCIsCiAgInNuYXBzaG90RGF0ZSI6ICIyMDI1LTA4LTE4IiwKICAidGltZXN0YW1wIjogIjIwMjUtMDgtMThUMDA6MDA6MDAuMDAwWiIsCiAgIm1ldHJpY3MiOiB7CiAgICAidG90YWxEcmlwSG9sZGVycyI6IDcsCiAgICAidG90YWxEcmlwU3VwcGx5IjogNywKICAgICJuZXdEb25vcnNUb2RheSI6IDIsCiAgICAidG90YWxXaXNoVG9BbGxvY2F0ZSI6IDQ1MCwKICAgICJiYXNlRGFpbHlSYXRlIjogNTAsCiAgICAiZ3Jvd3RoUmF0ZSI6IDAsCiAgICAiZ3Jvd3RoTXVsdGlwbGllciI6IDEsCiAgICAiZG9ub3JCb29zdGVyIjogMCwKICAgICJmaW5hbEVudGl0bGVtZW50IjogNTAsCiAgICAiZXhjaGFuZ2VSYXRlIjogMC4wMDEKICB9LA==";
+
+const decoded = Buffer.from(message, 'base64').toString('utf8');
+console.log('Decoded HCS Message:');
+console.log(decoded);
+
+const parsed = JSON.parse(decoded);
+console.log('\nParsed Data:');
+console.log(JSON.stringify(parsed, null, 2));

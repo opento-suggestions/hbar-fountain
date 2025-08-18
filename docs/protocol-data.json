@@ -1,5 +1,5 @@
 {
-  "lastUpdated": "2025-08-18T05:19:27.072Z",
+  "lastUpdated": "2025-08-18T05:39:50.354Z",
   "latestSnapshot": {
     "protocol": "Fountain Protocol",
     "version": "1.0",
@@ -125,9 +125,9 @@
       "discoveryMethod": "DYNAMIC_MIRROR_NODE_QUERY"
     }
   },
-  "lastHCSMessage": "1755493152.126371000",
-  "totalMessages": 14,
-  "totalProtocolEvents": 2,
+  "lastHCSMessage": "1755495497.244136594",
+  "totalMessages": 46,
+  "totalProtocolEvents": 34,
   "topicId": "0.0.6591043",
   "source": "real-hcs-data-enhanced"
 }

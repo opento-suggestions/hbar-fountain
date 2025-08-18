@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fountain Protocol - Hedera DeFi Innovation</title>
+    <link rel="stylesheet" href="css/fountain.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="app-container">
+        <!-- Header -->
+        <header class="header">
+            <div class="header-content">
+                <div class="logo">
+                    <h1>🌊 Fountain Protocol</h1>
+                    <span class="tagline">Sustainable DeFi on Hedera</span>
+                </div>
+                <div class="header-actions">
+                    <div class="network-indicator">
+                        <span class="network-dot"></span>
+                        <span id="network-status">Hedera Testnet</span>
+                    </div>
+                    <button id="wallet-connect-btn" class="wallet-btn">
+                        Connect Wallet
+                    </button>
+                </div>
+            </div>
+        </header>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Welcome Section (shown when not connected) -->
+            <section id="welcome-section" class="welcome-section">
+                <div class="hero">
+                    <h2>Welcome to Fountain Protocol</h2>
+                    <p>A sustainable DeFi protocol built on Hedera Hashgraph featuring membership tokens (DRIP), utility tokens (WISH), and donation recognition (DROP).</p>
+                    
+                    <div class="protocol-stats">
+                        <div class="stat-card">
+                            <div class="stat-value" id="total-members">6</div>
+                            <div class="stat-label">Active Members</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-value" id="total-hbar">952.64</div>
+                            <div class="stat-label">HBAR in Treasury</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-value" id="total-wishes">0</div>
+                            <div class="stat-label">WISH Tokens</div>
+                        </div>
+                    </div>
+
+                    <div class="how-it-works">
+                        <h3>How It Works</h3>
+                        <div class="steps">
+                            <div class="step">
+                                <div class="step-number">1</div>
+                                <h4>Join Protocol</h4>
+                                <p>Deposit 1 HBAR to receive DRIP membership token</p>
+                            </div>
+                            <div class="step">
+                                <div class="step-number">2</div>
+                                <h4>Earn WISH</h4>
+                                <p>Receive 50 WISH tokens daily (75 with DROP bonus)</p>
+                            </div>
+                            <div class="step">
+                                <div class="step-number">3</div>
+                                <h4>AutoRedeem</h4>
+                                <p>Burn 1000 WISH → Get 1.8 HBAR + new membership (0.8 HBAR profit)</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- User Dashboard (shown when connected) -->
+            <section id="dashboard-section" class="dashboard-section" style="display: none;">
+                <div class="dashboard-header">
+                    <h2>Your Protocol Dashboard</h2>
+                    <div class="user-info">
+                        <span class="user-address" id="user-address">0.0.123456</span>
+                        <span class="user-balance" id="user-hbar-balance">10.5 ℏ</span>
+                    </div>
+                </div>
+
+                <div class="dashboard-grid">
+                    <!-- Membership Status -->
+                    <div class="dashboard-card membership-card">
+                        <h3>🎪 Membership Status</h3>
+                        <div class="membership-info">
+                            <div class="membership-status" id="membership-status">
+                                <span class="status-indicator inactive"></span>
+                                <span>Not a Member</span>
+                            </div>
+                            <div class="membership-details" id="membership-details">
+                                <div class="detail">
+                                    <span>DRIP Tokens:</span>
+                                    <span id="drip-balance">0</span>
+                                </div>
+                                <div class="detail">
+                                    <span>Daily WISH Rate:</span>
+                                    <span id="wish-rate">0 per day</span>
+                                </div>
+                            </div>
+                        </div>
+                        <button id="join-protocol-btn" class="action-btn primary" style="display: none;">
+                            Join Protocol (1 HBAR)
+                        </button>
+                    </div>
+
+                    <!-- WISH Tokens -->
+                    <div class="dashboard-card wish-card">
+                        <h3>💰 WISH Tokens</h3>
+                        <div class="wish-info">
+                            <div class="wish-balance">
+                                <span class="balance-amount" id="wish-balance">0</span>
+                                <span class="balance-label">WISH Tokens</span>
+                            </div>
+                            <div class="wish-quota">
+                                <div class="quota-bar">
+                                    <div class="quota-fill" id="quota-fill" style="width: 0%"></div>
+                                </div>
+                                <span class="quota-text" id="quota-text">0/1000 quota used</span>
+                            </div>
+                        </div>
+                        <button id="autoredeem-btn" class="action-btn success" disabled>
+                            AutoRedeem (Need 1000 WISH)
+                        </button>
+                    </div>
+
+                    <!-- Donation Recognition -->
+                    <div class="dashboard-card donation-card">
+                        <h3>🎁 Donation Recognition</h3>
+                        <div class="donation-info">
+                            <div class="donation-status" id="donation-status">
+                                <span class="status-indicator inactive"></span>
+                                <span>No Recognition</span>
+                            </div>
+                            <div class="donation-details">
+                                <div class="detail">
+                                    <span>DROP Tokens:</span>
+                                    <span id="drop-balance">0.00000000</span>
+                                </div>
+                                <div class="detail">
+                                    <span>WISH Bonus:</span>
+                                    <span id="wish-bonus">+0 per day</span>
+                                </div>
+                            </div>
+                        </div>
+                        <button id="donate-btn" class="action-btn accent">
+                            Donate for Recognition
+                        </button>
+                    </div>
+
+                    <!-- Protocol Activity -->
+                    <div class="dashboard-card activity-card">
+                        <h3>📋 Recent Activity</h3>
+                        <div class="activity-list" id="activity-list">
+                            <div class="activity-item">
+                                <span class="activity-icon">🔄</span>
+                                <div class="activity-content">
+                                    <div class="activity-text">Welcome to Fountain Protocol!</div>
+                                    <div class="activity-time">Connect your wallet to see activity</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- AutoRedeem Calculator -->
+                <div class="calculator-section">
+                    <h3>📊 AutoRedeem Calculator</h3>
+                    <div class="calculator-card">
+                        <div class="calculator-input">
+                            <label>Current WISH Balance:</label>
+                            <input type="number" id="calc-wish-balance" placeholder="0" readonly>
+                        </div>
+                        <div class="calculator-input">
+                            <label>Daily WISH Rate:</label>
+                            <input type="number" id="calc-wish-rate" placeholder="50" readonly>
+                        </div>
+                        <div class="calculator-results">
+                            <div class="result-item">
+                                <span>Days until AutoRedeem:</span>
+                                <span id="calc-days-until">--</span>
+                            </div>
+                            <div class="result-item">
+                                <span>Potential Profit:</span>
+                                <span id="calc-profit">0.8 HBAR</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </main>
+
+        <!-- Modals -->
+        <div id="wallet-modal" class="modal">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h3>Connect Your Wallet</h3>
+                    <button class="modal-close">&times;</button>
+                </div>
+                <div class="modal-body">
+                    <div class="wallet-options">
+                        <button class="wallet-option" data-wallet="hashpack">
+                            <span class="wallet-icon">📱</span>
+                            <span>HashPack</span>
+                        </button>
+                        <button class="wallet-option" data-wallet="blade">
+                            <span class="wallet-icon">⚔️</span>
+                            <span>Blade Wallet</span>
+                        </button>
+                        <button class="wallet-option" data-wallet="test">
+                            <span class="wallet-icon">🧪</span>
+                            <span>Test Mode</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="transaction-modal" class="modal">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h3>Transaction in Progress</h3>
+                </div>
+                <div class="modal-body">
+                    <div class="transaction-status">
+                        <div class="spinner"></div>
+                        <p id="transaction-message">Processing transaction...</p>
+                        <div class="transaction-details" id="transaction-details" style="display: none;">
+                            <p>Transaction ID: <span id="transaction-id"></span></p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="js/constants.js"></script>
+    <script src="js/wallet-connect.js"></script>
+    <script src="js/protocol-client.js"></script>
+    <script src="js/ui-components.js"></script>
+    <script src="js/app.js"></script>
+</body>
+</html>
