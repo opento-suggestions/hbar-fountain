@@ -1,42 +1,38 @@
 {
-  "lastUpdated": "2025-08-18T03:45:00.000Z",
+  "lastUpdated": "2025-08-18T05:12:55.150Z",
   "latestSnapshot": {
     "protocol": "Fountain Protocol",
     "version": "1.0",
     "type": "daily_snapshot",
-    "snapshotDate": "2025-08-18",
-    "timestamp": "2025-08-18T00:00:00.000Z",
+    "snapshotDate": "2025-08-17",
+    "timestamp": "2025-08-17T04:17:44.059Z",
     "metrics": {
-      "totalDripHolders": 47,
-      "totalDripSupply": 47,
-      "newDonorsToday": 3,
-      "totalWishToAllocate": 2350,
+      "totalDripHolders": 1,
+      "totalDripSupply": 1,
+      "totalWishToAllocate": 50,
       "baseDailyRate": 50,
-      "growthRate": 0.0426,
-      "growthMultiplier": 1.2,
-      "donorBooster": 0,
-      "finalEntitlement": 60,
       "exchangeRate": 0.001
     },
     "entitlements": {
-      "defaultPerDrip": 60
-    },
-    "formulas": {
-      "growthRate": "gt = (Nt - Nt-1) / Nt-1",
-      "cumulativeScore": "C += 0.1 if gt >= 2%",
-      "growthMultiplier": "Mt = min(1 + C, 1.5)",
-      "donorBooster": "Bt = (Dt <= Nt) ? 0 : min(floor(50 * ((Dt/Nt) - 1)), 25)",
-      "finalEntitlement": "Et = floor((50 + Bt) * Mt)"
+      "0.0.6552092": {
+        "accountId": "0.0.6552092",
+        "dripBalance": 1,
+        "dailyWish": 50,
+        "claimable": 50,
+        "calculatedAt": "2025-08-17T04:17:44.059Z"
+      }
     },
     "tokenAddresses": {
       "DRIP": "0.0.6591211",
       "WISH": "0.0.6590974",
       "DROP": "0.0.6590982"
     },
-    "treasury": "0.0.6552092"
+    "treasury": "0.0.6552092",
+    "nextSnapshotScheduled": "2025-08-18T00:00:00.000Z"
   },
-  "lastHCSMessage": "2025-08-18T03:30:00.000Z",
-  "totalMessages": 156,
+  "lastHCSMessage": "1755404261.428692230",
+  "totalMessages": 36,
+  "totalProtocolEvents": 4,
   "topicId": "0.0.6591043",
-  "source": "demo-data"
+  "source": "real-hcs-data"
 }
