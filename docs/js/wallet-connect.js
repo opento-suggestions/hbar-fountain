@@ -5,6 +5,7 @@ class WalletManager {
         this.currentWallet = null;
         this.accountId = null;
         this.publicKey = null;
+        this.dAppConnector = null; // For HashPack/WalletConnect
         this.callbacks = {
             onConnect: [],
             onDisconnect: [],
@@ -25,34 +26,99 @@ class WalletManager {
         }
     }
 
-    // HashPack Wallet Integration
+    // HashPack Wallet Integration via HashConnect
     async connectHashPack() {
         try {
-            if (!window.hashpack) {
-                throw new Error('HashPack wallet not found');
-            }
-
-            const hashconnect = window.hashpack;
-            const connectionData = await hashconnect.connectToLocalWallet();
-            
-            if (connectionData && connectionData.accountIds.length > 0) {
-                this.connected = true;
-                this.currentWallet = 'hashpack';
-                this.accountId = connectionData.accountIds[0];
-                this.publicKey = connectionData.publicKey;
-                
-                this.emit('onConnect', {
-                    wallet: 'hashpack',
-                    accountId: this.accountId,
-                    publicKey: this.publicKey
-                });
-                
+            // Check if HashConnect is available (loaded from CDN)
+            if (!window.HashConnect) {
                 return {
-                    success: true,
-                    accountId: this.accountId,
-                    publicKey: this.publicKey
+                    success: false,
+                    error: 'HashConnect library not loaded. Please refresh the page.'
                 };
             }
+
+            // Initialize HashConnect
+            const hashconnect = new window.HashConnect();
+            
+            // Store hashconnect instance for later use
+            this.hashconnect = hashconnect;
+            
+            // Set up app metadata
+            const appMetadata = {
+                name: "Fountain Protocol",
+                description: "A sustainable DeFi protocol built on Hedera",
+                url: window.location.origin,
+                icon: window.location.origin + "/icon.png"
+            };
+            
+            // Initialize HashConnect
+            const initData = await hashconnect.init(appMetadata, "testnet", false);
+            
+            // Save pairing data
+            this.pairingData = initData.savedPairings?.[0] || null;
+            
+            // Set up event listeners
+            hashconnect.foundExtensionEvent.once((walletMetadata) => {
+                console.log('HashPack extension found:', walletMetadata);
+            });
+            
+            hashconnect.pairingEvent.once((pairingData) => {
+                console.log('Paired with wallet:', pairingData);
+                this.pairingData = pairingData;
+                
+                // Extract account ID
+                if (pairingData.accountIds && pairingData.accountIds.length > 0) {
+                    this.connected = true;
+                    this.currentWallet = 'hashpack';
+                    this.accountId = pairingData.accountIds[0];
+                    
+                    this.emit('onConnect', {
+                        wallet: 'hashpack',
+                        accountId: this.accountId
+                    });
+                }
+            });
+            
+            // Try to connect to local extension
+            hashconnect.connectToLocalWallet();
+            
+            // Wait for connection with timeout
+            return new Promise((resolve) => {
+                let resolved = false;
+                
+                // Success handler
+                const successHandler = (pairingData) => {
+                    if (!resolved) {
+                        resolved = true;
+                        if (pairingData.accountIds && pairingData.accountIds.length > 0) {
+                            resolve({
+                                success: true,
+                                accountId: pairingData.accountIds[0]
+                            });
+                        } else {
+                            resolve({
+                                success: false,
+                                error: 'No accounts found in HashPack'
+                            });
+                        }
+                    }
+                };
+                
+                // Listen for pairing
+                hashconnect.pairingEvent.once(successHandler);
+                
+                // Timeout after 30 seconds
+                setTimeout(() => {
+                    if (!resolved) {
+                        resolved = true;
+                        resolve({
+                            success: false,
+                            error: 'Connection timeout. Please ensure HashPack is installed and try again.'
+                        });
+                    }
+                }, 30000);
+            });
+            
         } catch (error) {
             console.error('HashPack connection failed:', error);
             return {
@@ -143,9 +209,9 @@ class WalletManager {
 
     // Disconnect wallet
     async disconnect() {
-        if (this.currentWallet === 'hashpack' && window.hashpack) {
+        if (this.currentWallet === 'hashpack' && this.hashconnect) {
             try {
-                await window.hashpack.disconnect();
+                await this.hashconnect.disconnect(this.pairingData?.topic);
             } catch (error) {
                 console.error('HashPack disconnect error:', error);
             }
@@ -194,20 +260,22 @@ class WalletManager {
     }
 
     async executeHashPackTransaction(transaction) {
-        if (!window.hashpack) {
-            return { success: false, error: 'HashPack not available' };
+        if (!this.hashconnect || !this.pairingData) {
+            return { success: false, error: 'HashPack not connected' };
         }
 
         try {
-            const response = await window.hashpack.sendTransaction(
-                this.accountId,
-                transaction
-            );
+            // Send transaction through HashConnect
+            const provider = this.hashconnect.getProvider("testnet", this.pairingData.topic, this.accountId);
+            const signer = this.hashconnect.getSigner(provider);
+            
+            // Execute the transaction
+            const response = await transaction.executeWithSigner(signer);
             
             return {
                 success: true,
-                transactionId: response.transactionId,
-                receipt: response.receipt
+                transactionId: response.transactionId?.toString(),
+                receipt: response
             };
         } catch (error) {
             return {
