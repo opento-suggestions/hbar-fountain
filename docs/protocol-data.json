@@ -1,26 +1,114 @@
 {
-  "lastUpdated": "2025-08-18T05:12:55.150Z",
+  "lastUpdated": "2025-08-18T05:19:27.072Z",
   "latestSnapshot": {
     "protocol": "Fountain Protocol",
     "version": "1.0",
     "type": "daily_snapshot",
-    "snapshotDate": "2025-08-17",
-    "timestamp": "2025-08-17T04:17:44.059Z",
+    "snapshotDate": "2025-08-18",
+    "timestamp": "2025-08-18T00:00:00.000Z",
     "metrics": {
-      "totalDripHolders": 1,
-      "totalDripSupply": 1,
-      "totalWishToAllocate": 50,
+      "totalDripHolders": 7,
+      "totalDripSupply": 7,
+      "newDonorsToday": 2,
+      "totalWishToAllocate": 450,
       "baseDailyRate": 50,
+      "growthRate": 0,
+      "growthMultiplier": 1,
+      "donorBooster": 0,
+      "finalEntitlement": 50,
       "exchangeRate": 0.001
     },
-    "entitlements": {
+    "calculations": {
+      "previousHolders": 7,
+      "currentHolders": 7,
+      "growthRatePercent": "0.00%",
+      "cumulativeScore": 0,
+      "thresholdMet": false,
+      "dayOfWeek": "Sunday"
+    },
+    "memberEntitlements": {
+      "0.0.6599772": {
+        "accountId": "0.0.6599772",
+        "dripBalance": 1,
+        "dropBalance": 100000000,
+        "baseEntitlement": 50,
+        "dropBonus": 25,
+        "totalEntitlement": 75,
+        "memberType": "Member+Donor"
+      },
+      "0.0.6599183": {
+        "accountId": "0.0.6599183",
+        "dripBalance": 1,
+        "dropBalance": 1,
+        "baseEntitlement": 50,
+        "dropBonus": 25,
+        "totalEntitlement": 75,
+        "memberType": "Member+Donor"
+      },
+      "0.0.6599182": {
+        "accountId": "0.0.6599182",
+        "dripBalance": 1,
+        "dropBalance": 0,
+        "baseEntitlement": 50,
+        "dropBonus": 0,
+        "totalEntitlement": 50,
+        "memberType": "Member"
+      },
+      "0.0.6599181": {
+        "accountId": "0.0.6599181",
+        "dripBalance": 1,
+        "dropBalance": 1,
+        "baseEntitlement": 50,
+        "dropBonus": 25,
+        "totalEntitlement": 75,
+        "memberType": "Member+Donor"
+      },
+      "0.0.6599180": {
+        "accountId": "0.0.6599180",
+        "dripBalance": 1,
+        "dropBalance": 0,
+        "baseEntitlement": 50,
+        "dropBonus": 0,
+        "totalEntitlement": 50,
+        "memberType": "Member"
+      },
+      "0.0.6599179": {
+        "accountId": "0.0.6599179",
+        "dripBalance": 1,
+        "dropBalance": 1,
+        "baseEntitlement": 50,
+        "dropBonus": 25,
+        "totalEntitlement": 75,
+        "memberType": "Member+Donor"
+      },
       "0.0.6552092": {
         "accountId": "0.0.6552092",
-        "dripBalance": 1,
-        "dailyWish": 50,
-        "claimable": 50,
-        "calculatedAt": "2025-08-17T04:17:44.059Z"
+        "dripBalance": 2,
+        "dropBalance": 0,
+        "baseEntitlement": 50,
+        "dropBonus": 0,
+        "totalEntitlement": 50,
+        "memberType": "Treasury"
       }
+    },
+    "memberSummary": {
+      "totalMembers": 7,
+      "membersWithDrop": 4,
+      "treasuryIncluded": true,
+      "averageEntitlement": 64.28571428571429
+    },
+    "dailyVariations": {
+      "newMembersToday": 0,
+      "newDonorsToday": 2,
+      "memberActivity": []
+    },
+    "formulas": {
+      "growthRate": "gt = (Nt - Nt-1) / Nt-1",
+      "cumulativeScore": "C += 0.1 if gt >= 2%",
+      "growthMultiplier": "Mt = min(1 + C, 1.5)",
+      "donorBooster": "Bt = (Dt <= Nt) ? 0 : min(floor(50 * ((Dt/Nt) - 1)), 25)",
+      "finalEntitlement": "Et = floor((50 + Bt) * Mt)",
+      "personalBonus": "Individual DROP bonus: +25 WISH if hasDrop"
     },
     "tokenAddresses": {
       "DRIP": "0.0.6591211",
@@ -28,11 +116,18 @@
       "DROP": "0.0.6590982"
     },
     "treasury": "0.0.6552092",
-    "nextSnapshotScheduled": "2025-08-18T00:00:00.000Z"
+    "nextSnapshotScheduled": "2025-08-19T00:00:00.000Z",
+    "auditTrail": {
+      "operation": "DAILY_SNAPSHOT",
+      "initiator": "PROTOCOL_SCHEDULER",
+      "approver": "0.0.6552092",
+      "compliance": "MATHEMATICAL_TRANSPARENCY",
+      "discoveryMethod": "DYNAMIC_MIRROR_NODE_QUERY"
+    }
   },
-  "lastHCSMessage": "1755404261.428692230",
-  "totalMessages": 36,
-  "totalProtocolEvents": 4,
+  "lastHCSMessage": "1755493152.126371000",
+  "totalMessages": 14,
+  "totalProtocolEvents": 2,
   "topicId": "0.0.6591043",
-  "source": "real-hcs-data"
+  "source": "real-hcs-data-enhanced"
 }
