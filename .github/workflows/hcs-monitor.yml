@@ -46,9 +46,9 @@ jobs:
          * Uses Mirror Node API instead of direct HCS subscription for better reliability
          */
         
-        const https = require('https');
-        const fs = require('fs').promises;
-        const path = require('path');
+        import https from 'https';
+        import { promises as fs } from 'fs';
+        import path from 'path';
         
         class HCSMonitor {
             constructor() {
