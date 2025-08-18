@@ -2,7 +2,7 @@
 
 Sustainable DeFi protocol on Hedera Hashgraph with membership tokens (💦 $DRIP), utility tokens (✨ $WISH), and donor recognition tokens (💧 $DROP).
 
-**Live Protocol (Alpha Preview Build v0.01):** https://peaceful-profiterole-7d59be.netlify.app/fountain-ui.html
+**Live Protocol (Alpha Preview Build v0.01):** https://peaceful-profiterole-7d59be.netlify.app/
 
 ## Token Architecture (HTS)
 - **💦 DRIP**: Non-transferable membership token (freeze mechanics)

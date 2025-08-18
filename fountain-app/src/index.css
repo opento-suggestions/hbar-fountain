@@ -106,4 +106,111 @@
   .fountain-mono {
     @apply font-mono text-sm bg-mist-50 px-2 py-1 rounded-lg border border-steam-200;
   }
+  
+  /* Fountain Background Effects */
+  .fountain-background {
+    @apply fixed inset-0 pointer-events-none;
+    z-index: -1;
+  }
+  
+  .fountain-mist {
+    @apply absolute inset-0;
+    background: radial-gradient(ellipse at center bottom, 
+      rgba(240, 249, 255, 0.9) 0%,
+      rgba(224, 242, 254, 0.7) 25%, 
+      rgba(248, 250, 252, 0.5) 50%,
+      rgba(248, 250, 252, 0.3) 75%,
+      rgba(248, 250, 252, 0.1) 100%);
+    animation: fountainMist 8s ease-in-out infinite alternate;
+  }
+  
+  .fountain-glow {
+    @apply absolute inset-0;
+    background: radial-gradient(ellipse 800px 400px at 50% 80%, 
+      rgba(56, 189, 248, 0.15) 0%,
+      rgba(14, 165, 233, 0.1) 30%,
+      rgba(3, 105, 161, 0.05) 60%,
+      transparent 100%);
+    animation: fountainGlow 6s ease-in-out infinite alternate;
+  }
+  
+  .fountain-refraction {
+    @apply absolute inset-0;
+    background: 
+      linear-gradient(45deg, transparent 0%, rgba(14, 165, 233, 0.03) 25%, transparent 50%),
+      linear-gradient(-45deg, transparent 0%, rgba(56, 189, 248, 0.02) 25%, transparent 50%),
+      linear-gradient(90deg, transparent 0%, rgba(3, 105, 161, 0.02) 50%, transparent 100%);
+    animation: fountainRefraction 12s linear infinite;
+  }
+  
+  .fountain-edge-fade {
+    @apply absolute inset-0;
+    background: radial-gradient(ellipse at center, 
+      transparent 0%,
+      transparent 60%,
+      rgba(15, 23, 42, 0.02) 80%,
+      rgba(15, 23, 42, 0.05) 100%);
+  }
+  
+  .fountain-particles {
+    mix-blend-mode: screen;
+  }
+}
+
+/* Fountain Animations */
+@keyframes fountainMist {
+  0% { 
+    transform: scale(1) translateY(0px);
+    opacity: 0.9;
+  }
+  50% { 
+    transform: scale(1.05) translateY(-10px);
+    opacity: 0.7;
+  }
+  100% { 
+    transform: scale(1.1) translateY(-20px);
+    opacity: 0.8;
+  }
+}
+
+@keyframes fountainGlow {
+  0% { 
+    transform: scale(1) rotate(0deg);
+    opacity: 0.15;
+  }
+  33% { 
+    transform: scale(1.1) rotate(1deg);
+    opacity: 0.12;
+  }
+  66% { 
+    transform: scale(1.05) rotate(-1deg);
+    opacity: 0.18;
+  }
+  100% { 
+    transform: scale(1.15) rotate(0deg);
+    opacity: 0.1;
+  }
+}
+
+@keyframes fountainRefraction {
+  0% { 
+    transform: translateX(-100px) translateY(-50px) rotate(0deg);
+    opacity: 0.6;
+  }
+  25% { 
+    transform: translateX(50px) translateY(-25px) rotate(0.5deg);
+    opacity: 0.8;
+  }
+  50% { 
+    transform: translateX(0px) translateY(0px) rotate(0deg);
+    opacity: 0.5;
+  }
+  75% { 
+    transform: translateX(-50px) translateY(25px) rotate(-0.5deg);
+    opacity: 0.9;
+  }
+  100% { 
+    transform: translateX(-100px) translateY(-50px) rotate(0deg);
+    opacity: 0.6;
+  }
 }
